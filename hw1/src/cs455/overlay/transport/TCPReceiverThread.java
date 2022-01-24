@@ -1,31 +1,32 @@
 package cs455.overlay.transport;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
+import java.io.*;
 
-public class TCPReceiverThread implements Runnable{
-    private Socket socket;
-    private DataInputStream din;
+public class TCPReceiverThread implements Runnable {
+    private Socket socket = null;
+    private DataInputStream input = null;
 
     public TCPReceiverThread(Socket socket) throws IOException {
         this.socket = socket;
-        din = new DataInputStream(socket.getInputStream());
+        input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
 
+    @Override
     public void run() {
         int dataLength;
         while (socket != null) {
             try {
-                dataLength = din.readInt();
+                dataLength = input.readInt();
                 byte[] data = new byte[dataLength];
-                din.readFully(data, 0, dataLength);
+                input.readFully(data, 0, dataLength);
+                String string = new String(data);
+                System.out.println("Client says " + string);
             } catch (SocketException se) {
                 System.out.println(se.getMessage());
                 break;
             } catch (IOException ioe) {
-                System.out.println(ioe.getMessage()) ;
+                System.out.println(ioe.getMessage());
                 break;
             }
         }
