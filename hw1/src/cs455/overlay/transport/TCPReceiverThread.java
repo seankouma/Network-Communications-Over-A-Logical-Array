@@ -1,6 +1,9 @@
 package cs455.overlay.transport;
 
 import java.net.*;
+
+import cs455.overlay.wireformats.Register;
+
 import java.io.*;
 
 public class TCPReceiverThread implements Runnable {
@@ -20,8 +23,9 @@ public class TCPReceiverThread implements Runnable {
                 dataLength = input.readInt();
                 byte[] data = new byte[dataLength];
                 input.readFully(data, 0, dataLength);
-                String string = new String(data);
-                System.out.println("Client says " + string);
+                Register register = new Register(data);
+                System.out.println("Type: " + Integer.toString(register.getType()) + ", IP: " + register.getIp() + ", Port: " + Integer.toString(register.getPort()));
+                
             } catch (SocketException se) {
                 System.out.println(se.getMessage());
                 break;
