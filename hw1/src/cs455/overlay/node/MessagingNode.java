@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.Register;
 
 public class MessagingNode {
     TCPServerThread server = null;
@@ -28,12 +29,15 @@ public class MessagingNode {
             }
         }
         sender = new TCPSender(socket);
-        while (true) {
-            DataInputStream input  = new DataInputStream(System.in);
-            String line = input.readLine();
-            byte[] bytes = getBytes(line);
-            sender.sendData(bytes);
-        }
+        // while (true) {
+        //     DataInputStream input  = new DataInputStream(System.in);
+        //     String line = input.readLine();
+        //     byte[] bytes = getBytes(line);
+        //     sender.sendData(bytes);
+        // }
+        Register register = new Register("127.0.0.1", selfPort);
+        byte[] bytes = register.getBytes();
+        sender.sendData(bytes);
 
     }
 
