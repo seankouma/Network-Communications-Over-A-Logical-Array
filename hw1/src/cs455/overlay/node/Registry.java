@@ -8,6 +8,9 @@ import java.io.InputStreamReader;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 
+import java.util.HashSet;
+import java.util.Random;
+
 public class Registry {
     TCPServerThread server = null;
     TCPSender sender = null;
@@ -24,7 +27,17 @@ public class Registry {
         }
     }
 
+    public int assignIdentifier(){
+        Random rand = new Random();
+        HashSet<Integer> duplicateCheck = new HashSet<Integer>();
+        int max = 1023;
+        int validNum = rand.nextInt(max);
+        while(duplicateCheck.contains(validNum)){
+            validNum = rand.nextInt(max);
+        }
 
+        return validNum;
+    }
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
