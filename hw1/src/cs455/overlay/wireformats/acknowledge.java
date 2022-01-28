@@ -21,20 +21,51 @@ public class acknowledge implements Protocol, Event {
         this.info = info;
     }  
 
-    public acknowledge(byte[] marshalledbytes) throws IOException{
-        
+    public acknowledge(byte[] marshalledBytes) throws IOException{
+        ByteArrayInputStream byteArrInputStream =
+        new ByteArrayInputStream(marshalledBytes);
+        DataInputStream din =
+        new DataInputStream(new BufferedInputStream(byteArrInputStream));
+        messageType = din.readInt();
+        int statusLength = din.readInt();
+        int identifierLength = din.readInt();
+        byte[] statusBytes = new byte[statusLength];
+        byte[] identifierBytes = new byte[identifierLength];
+        din.readFully(statusBytes);
+        din.readFully(identifierBytes);
+        status = din.readByte();
+        identifier = din.readInt();
+        byteArrInputStream.close();
+        din.close();
     }
 
     @Override
     public byte[] getBytes() throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+        byte[] marshalledBytes = null;
+        ByteArrayOutputStream byteArrOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dout =
+        new DataOutputStream(new BufferedOutputStream(byteArrOutputStream));
+        dout.writeInt(messageType);
+        dout.writeInt(identifier);
+        dout.writeByte(status);
+        dout.flush();
+        marshalledBytes = byteArrOutputStream.toByteArray();
+        byteArrOutputStream.close();
+        dout.close();
+        return marshalledBytes;
     }
 
     @Override
     public int getType() {
-        // TODO Auto-generated method stub
-        return 0;
+        return messageType;
+    }
+
+    public byte getStatus(){
+        return status;
+    }
+
+    public int getIdentifier(){
+        return identifier;
     }
     // registry responds to messaging nodes with this ack
     //tells them to wait until all nodes are 
