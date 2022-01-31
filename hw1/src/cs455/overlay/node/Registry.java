@@ -27,7 +27,7 @@ public class Registry {
         }
     }
 
-    public int assignIdentifier(){
+    public static int assignIdentifier(){
         Random rand = new Random();
         HashSet<Integer> duplicateCheck = new HashSet<Integer>();
         int max = 1023;
@@ -47,6 +47,7 @@ public class Registry {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
     }
     
 }
