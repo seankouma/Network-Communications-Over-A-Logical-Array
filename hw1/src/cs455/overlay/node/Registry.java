@@ -68,6 +68,8 @@ public class Registry implements Node {
         return rand;
     }
 
+    //derister check if id is valid
+
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {
