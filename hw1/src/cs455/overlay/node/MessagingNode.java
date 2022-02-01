@@ -7,16 +7,21 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 
-public class MessagingNode {
+public class MessagingNode implements Node {
     TCPServerThread server = null;
-    TCPSender sender = null;
+    public TCPSender sender = null;
+    public int identifier = 0;
+    Socket peerSocket = null;
 
     MessagingNode(int selfPort, int otherPort) throws IOException, InterruptedException {
-        server = new TCPServerThread(selfPort);
+        server = new TCPServerThread(selfPort, this);
         Thread sthread = new Thread(server);
         sthread.start();
         InetAddress addr = InetAddress.getByName("127.0.0.1");
@@ -38,7 +43,6 @@ public class MessagingNode {
         Register register = new Register("127.0.0.1", selfPort);
         byte[] bytes = register.getBytes();
         sender.sendData(bytes);
-
     }
 
     public byte[] getBytes(String line) throws IOException {
@@ -62,6 +66,23 @@ public class MessagingNode {
         int selfPort = Integer.parseInt(args[0]);
         int otherPort = Integer.parseInt(args[1]);
         MessagingNode node = new MessagingNode(selfPort, otherPort);
+    }
+
+    @Override
+    public void setIdentifier(int id) {
+        this.identifier = id;
+    }
+
+    @Override
+    public int getIdentifier() {
+        return this.identifier;
+    }
+
+    @Override
+    public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
+        this.peerSocket = new Socket(connect.getIp(), connect.getPort());
+        System.out.println("Connected to: " + Integer.toString(this.peerSocket.getPort()));
+        
     }
     
 }
