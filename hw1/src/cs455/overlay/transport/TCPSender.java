@@ -6,10 +6,8 @@ import java.net.Socket;
 
 public class TCPSender {
     private DataOutputStream dout;
-    private Socket socket;
 
     public TCPSender(Socket socket) throws IOException {
-        this.socket = socket;
         dout = new DataOutputStream(socket.getOutputStream());
     }
 
