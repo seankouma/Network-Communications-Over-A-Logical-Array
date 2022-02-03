@@ -71,7 +71,7 @@ public class TCPReceiverThread implements Runnable {
 
     void sendRegisterResponse(int identifier) throws IOException {
         byte[] bytes = getResponseBytes(identifier);
-        Socket socket = Registry.map.get(identifier);
+        Socket socket = Registry.nodes.get(identifier);
         TCPSender sender = new TCPSender(socket);
         sender.sendData(bytes);
     }
@@ -88,6 +88,4 @@ public class TCPReceiverThread implements Runnable {
         dout.close();
         return marshalledBytes;
     }
-
-    
 }

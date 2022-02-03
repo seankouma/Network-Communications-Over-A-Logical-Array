@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeSet;
-
+import java.util.Random;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
@@ -18,13 +18,7 @@ import cs455.overlay.wireformats.Register;
 
 public class Registry implements Node {
 
-    public static HashMap<Integer, Socket> map = new HashMap<Integer, Socket>();
-
-
-import java.util.HashSet;
-import java.util.Random;
-
-public class Registry {
+    public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
 
     TCPServerThread server = null;
     TCPSender sender = null;
@@ -33,56 +27,50 @@ public class Registry {
         Thread sthread = new Thread(server);
         sthread.start();
 
-        while (map.size() < 5) {
+        while (true) {
             BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             String line = input.readLine();
             if (line.equals("list-messaging-nodes")) {
                 listNodes();
             } else if (line.equals("setup-overlay")) {
                 start();
+            } else {
+                String pattern = "^start \\d$";
+                Pattern r = Pattern.compile(pattern);
+                Matcher m = r.matcher(line);
             }
         }
     }
 
-
-    public static int assignIdentifier(){
-        Random rand = new Random();
-        HashSet<Integer> duplicateCheck = new HashSet<Integer>();
-        int max = 1023;
-        int validNum = rand.nextInt(max);
-        while(duplicateCheck.contains(validNum)){
-            validNum = rand.nextInt(max);
-        }
-
-        return validNum;
-
     public static void start() throws IOException {
-        ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(map.keySet()));
+        ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(nodes.keySet()));
         for (int i = 0; i < keys.size() - 1; i++) {
-            Socket next = map.get(keys.get(i+1));
+            Socket next = nodes.get(keys.get(i+1));
             ConnectionsDirective connect = new ConnectionsDirective(next.getInetAddress().getHostAddress(), next.getPort());
             byte[] data = connect.getBytes();
-            TCPSender sender = new TCPSender(map.get(keys.get(i)));
+            TCPSender sender = new TCPSender(nodes.get(keys.get(i)));
             sender.sendData(data);
         }
-        Socket next = map.get(keys.get(0));
+        Socket next = nodes.get(keys.get(0));
         ConnectionsDirective connect = new ConnectionsDirective(next.getInetAddress().getHostAddress(), next.getPort());
         byte[] data = connect.getBytes();
-        TCPSender sender = new TCPSender(map.get(keys.get(keys.size() - 1)));
+        TCPSender sender = new TCPSender(nodes.get(keys.get(keys.size() - 1)));
         sender.sendData(data);
     }
 
     public static int register(Register register) throws UnknownHostException, IOException {
         Random r = new Random();
-        Integer rand = r.nextInt();
+        int max = 1024;
+        Integer rand = r.nextInt(max);
+        while (nodes.keySet().contains(rand)) rand = r.nextInt(max);
         Socket socket = new Socket(register.getIp(), register.getPort());
-        map.put(rand, socket);
-        for (Integer i : map.keySet()) {
-            Socket current = map.get(i);
+        nodes.put(rand, socket);
+        for (Integer i : nodes.keySet()) {
+            Socket current = nodes.get(i);
             System.out.println("Num: " + Integer.toString(i) + ", IP: " + current.getInetAddress().getHostAddress() + ", Port: " + Integer.toString(current.getPort()));
             System.out.println();
         }
-        if (map.keySet().size() >= 4) start(); 
+        if (nodes.keySet().size() >= 4) start(); 
         return rand;
 
     }
@@ -99,7 +87,7 @@ public class Registry {
     }
 
     private void listNodes() {
-        for (Socket socket : map.values()) {
+        for (Socket socket : nodes.values()) {
             System.out.println("Hostname: " + socket.getInetAddress().getHostName() + ", Port: " + Integer.toString(socket.getPort()));
         }
     }
