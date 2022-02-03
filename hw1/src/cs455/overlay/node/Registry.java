@@ -20,6 +20,12 @@ public class Registry implements Node {
 
     public static HashMap<Integer, Socket> map = new HashMap<Integer, Socket>();
 
+
+import java.util.HashSet;
+import java.util.Random;
+
+public class Registry {
+
     TCPServerThread server = null;
     TCPSender sender = null;
     Registry(int port) throws IOException {
@@ -37,6 +43,18 @@ public class Registry implements Node {
             }
         }
     }
+
+
+    public static int assignIdentifier(){
+        Random rand = new Random();
+        HashSet<Integer> duplicateCheck = new HashSet<Integer>();
+        int max = 1023;
+        int validNum = rand.nextInt(max);
+        while(duplicateCheck.contains(validNum)){
+            validNum = rand.nextInt(max);
+        }
+
+        return validNum;
 
     public static void start() throws IOException {
         ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(map.keySet()));
@@ -66,6 +84,7 @@ public class Registry implements Node {
         }
         if (map.keySet().size() >= 4) start(); 
         return rand;
+
     }
 
     public static void main(String[] args) {
@@ -76,6 +95,7 @@ public class Registry implements Node {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
     }
 
     private void listNodes() {
