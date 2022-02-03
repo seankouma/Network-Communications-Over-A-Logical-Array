@@ -10,6 +10,8 @@ import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
+import cs455.overlay.wireformats.TaskInitiate;
+
 
 import java.io.*;
 
@@ -64,6 +66,11 @@ public class TCPReceiverThread implements Runnable {
                 System.out.println("Connections Directive!");
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
+            case Protocol.TASK_INITIATE:
+                System.out.println("Task Initiate!");
+                TaskInitiate task = new TaskInitiate(data);
+                caller.handleTaskInitiate(task.sendMessages);
+                System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
             default:
                 break;
         }

@@ -84,5 +84,10 @@ public class MessagingNode implements Node {
         System.out.println("Connected to: " + Integer.toString(this.peerSocket.getPort()));
         
     }
+
+    @Override
+    public void handleTaskInitiate(int num) {
+        System.out.println("Messages to send from node: " + Integer.toString(num));
+    }
     
 }

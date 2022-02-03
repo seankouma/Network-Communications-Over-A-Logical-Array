@@ -9,4 +9,5 @@ public interface Node {
     void setIdentifier(int id);
     int getIdentifier();
     void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException;
+    void handleTaskInitiate(int num);
 }

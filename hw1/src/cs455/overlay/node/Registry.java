@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Random;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskInitiate;
 
 public class Registry implements Node {
 
@@ -38,6 +41,9 @@ public class Registry implements Node {
                 String pattern = "^start \\d$";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(line);
+                if (m.find()) { // User input was "start #"
+
+                }
             }
         }
     }
@@ -72,7 +78,15 @@ public class Registry implements Node {
         }
         if (nodes.keySet().size() >= 4) start(); 
         return rand;
+    }
 
+    public void taskInitiate(int num) throws IOException {
+        TaskInitiate init = new TaskInitiate(num);
+        byte[] data = init.getBytes();
+        for (Socket s : nodes.values()) {
+            this.sender = new TCPSender(s);
+            this.sender.sendData(data);
+        }
     }
 
     public static void main(String[] args) {
@@ -106,6 +120,12 @@ public class Registry implements Node {
 
     @Override
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void handleTaskInitiate(int num) {
         // TODO Auto-generated method stub
         
     }
