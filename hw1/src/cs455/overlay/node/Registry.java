@@ -1,5 +1,8 @@
 package cs455.overlay.node;
 
+import java.util.HashSet;
+import java.util.Random;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,18 +19,14 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 
+
 public class Registry implements Node {
 
     public static HashMap<Integer, Socket> map = new HashMap<Integer, Socket>();
-
-
-import java.util.HashSet;
-import java.util.Random;
-
-public class Registry {
-
     TCPServerThread server = null;
     TCPSender sender = null;
+
+
     Registry(int port) throws IOException {
         server = new TCPServerThread(port, this);
         Thread sthread = new Thread(server);
@@ -55,6 +54,8 @@ public class Registry {
         }
 
         return validNum;
+
+    }
 
     public static void start() throws IOException {
         ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(map.keySet()));
