@@ -1,5 +1,8 @@
 package cs455.overlay.node;
 
+import java.util.HashSet;
+import java.util.Random;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,12 +19,14 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 
+
 public class Registry implements Node {
 
     public static HashMap<Integer, Socket> map = new HashMap<Integer, Socket>();
-
     TCPServerThread server = null;
     TCPSender sender = null;
+
+
     Registry(int port) throws IOException {
         server = new TCPServerThread(port, this);
         Thread sthread = new Thread(server);
@@ -36,6 +41,20 @@ public class Registry implements Node {
                 start();
             }
         }
+    }
+
+
+    public static int assignIdentifier(){
+        Random rand = new Random();
+        HashSet<Integer> duplicateCheck = new HashSet<Integer>();
+        int max = 1023;
+        int validNum = rand.nextInt(max);
+        while(duplicateCheck.contains(validNum)){
+            validNum = rand.nextInt(max);
+        }
+
+        return validNum;
+
     }
 
     public static void start() throws IOException {
@@ -66,6 +85,7 @@ public class Registry implements Node {
         }
         if (map.keySet().size() >= 4) start(); 
         return rand;
+
     }
 
     public static boolean deregister(Register register, int id) throws UnknownHostException, IOException {
@@ -82,6 +102,7 @@ public class Registry implements Node {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
     }
 
     private void listNodes() {
