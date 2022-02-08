@@ -67,7 +67,9 @@ public class TCPReceiverThread implements Runnable {
                 caller.handleConnect(connect);
             case Protocol.DEREGISTER_REQUEST:
                 System.out.println("Deregister");
-                deregister dereg = new deregister()
+                deregister dereg = new deregister(data, dataLength);
+                int identifier = Registry.deregister(register);
+                sendRegisterResponse(identifier);
             default:
                 break;
         }
