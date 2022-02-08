@@ -18,6 +18,7 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.Deregister;
 
 
 public class Registry implements Node {
@@ -25,6 +26,7 @@ public class Registry implements Node {
     public static HashMap<Integer, Socket> map = new HashMap<Integer, Socket>();
     TCPServerThread server = null;
     TCPSender sender = null;
+    public static HashSet<Integer> duplicateCheck = new HashSet<Integer>();
 
 
     Registry(int port) throws IOException {
@@ -46,11 +48,11 @@ public class Registry implements Node {
 
     public static int assignIdentifier(){
         Random rand = new Random();
-        HashSet<Integer> duplicateCheck = new HashSet<Integer>();
         int max = 1023;
-        int validNum = rand.nextInt(max);
-        while(duplicateCheck.contains(validNum)){
+        Integer validNum = rand.nextInt(max);
+        while(!(duplicateCheck.contains(validNum))){
             validNum = rand.nextInt(max);
+            duplicateCheck.add(validNum);
         }
 
         return validNum;
@@ -88,11 +90,16 @@ public class Registry implements Node {
 
     }
 
-    public static boolean deregister(Register register, int id) throws UnknownHostException, IOException {
-
+    public static boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {
+        if( duplicateCheck.contains(id)) {
+            duplicateCheck.remove(id);
+            return true;
+        }
         return false;
     }
     //derister check if id is valid
+    //tells node it can stop
+    //othwrwise message node to try again
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);

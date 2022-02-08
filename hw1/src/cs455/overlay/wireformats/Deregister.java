@@ -22,19 +22,19 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 
 
-public class deregister implements Protocol, Event{
+public class Deregister implements Protocol, Event{
     public int messageType = DEREGISTER_REQUEST;
     public String ip;
     public int port;
 
-    public deregister(String ip, int port) {
+    public Deregister(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
 
     //check if ID valid
 
-    public deregister(byte[] marshalledBytes) throws IOException {
+    public Deregister(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
         port = din.readInt();
@@ -45,7 +45,7 @@ public class deregister implements Protocol, Event{
         din.close();
     }
 
-    public deregister(byte[] marshalledBytes, int dataLength) throws IOException {
+    public Deregister(byte[] marshalledBytes, int dataLength) throws IOException {
         ByteArrayInputStream baInputStream =
         new ByteArrayInputStream(marshalledBytes);
         DataInputStream din =

@@ -20,6 +20,8 @@ public class MessagingNode implements Node {
     public int identifier = 0;
     Socket peerSocket = null;
 
+    //add shut down method
+
     MessagingNode(int selfPort, int otherPort) throws IOException, InterruptedException {
         server = new TCPServerThread(selfPort, this);
         Thread sthread = new Thread(server);

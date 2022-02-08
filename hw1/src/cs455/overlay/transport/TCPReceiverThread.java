@@ -10,7 +10,7 @@ import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
-import cs455.overlay.wireformats.deregister;
+import cs455.overlay.wireformats.Deregister;
 
 import java.io.*;
 
@@ -67,9 +67,15 @@ public class TCPReceiverThread implements Runnable {
                 caller.handleConnect(connect);
             case Protocol.DEREGISTER_REQUEST:
                 System.out.println("Deregister");
-                deregister dereg = new deregister(data, dataLength);
-                int identifier = Registry.deregister(register);
-                sendRegisterResponse(identifier);
+                Deregister dereg = new Deregister(data, dataLength);
+                boolean isRegistered = Registry.deregister(dereg, dataLength);
+                if(isRegistered){
+                 } //call shut down method in messagingNode
+                else{
+                    System.out.println("This ID does not exist");
+                    System.out.println("Failed to deregister node, try again");
+                }
+                break;
             default:
                 break;
         }
