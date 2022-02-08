@@ -10,6 +10,7 @@ import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
+import cs455.overlay.wireformats.deregister;
 
 import java.io.*;
 
@@ -64,6 +65,9 @@ public class TCPReceiverThread implements Runnable {
                 System.out.println("Connections Directive!");
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
+            case Protocol.DEREGISTER_REQUEST:
+                System.out.println("Deregister");
+                deregister dereg = new deregister()
             default:
                 break;
         }
