@@ -45,7 +45,20 @@ public class deregister implements Protocol, Event{
         din.close();
     }
 
-    @Override
+    public deregister(byte[] marshalledBytes, int dataLength) throws IOException {
+        ByteArrayInputStream baInputStream =
+        new ByteArrayInputStream(marshalledBytes);
+        DataInputStream din =
+        new DataInputStream(new BufferedInputStream(baInputStream));
+        int ipLength = din.readInt();
+        byte[] ipBytes = new byte[ipLength];
+        din.readFully(ipBytes);
+        ip = new String(ipBytes);
+        port = din.readInt();
+        baInputStream.close();
+        din.close();
+    }
+
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();

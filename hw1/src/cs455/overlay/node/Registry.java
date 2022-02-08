@@ -68,6 +68,10 @@ public class Registry implements Node {
         return rand;
     }
 
+    public static boolean deregister(Register register, int id) throws UnknownHostException, IOException {
+
+        return false;
+    }
     //derister check if id is valid
 
     public static void main(String[] args) {

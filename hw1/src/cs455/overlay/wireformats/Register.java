@@ -48,6 +48,7 @@ public class Register implements Protocol, Event {
         din.close();
     }
 
+
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
