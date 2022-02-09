@@ -38,11 +38,12 @@ public class Registry implements Node {
             } else if (line.equals("setup-overlay")) {
                 start();
             } else {
-                String pattern = "^start \\d$";
+                String pattern = "^start \\d*$";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(line);
                 if (m.find()) { // User input was "start #"
-
+                    int toSend = Integer.parseInt(line.replaceAll("[\\D]", ""));
+                    this.taskInitiate(toSend);
                 }
             }
         }
@@ -81,6 +82,7 @@ public class Registry implements Node {
     }
 
     public void taskInitiate(int num) throws IOException {
+        System.out.println("THE HECK");
         TaskInitiate init = new TaskInitiate(num);
         byte[] data = init.getBytes();
         for (Socket s : nodes.values()) {
@@ -127,6 +129,11 @@ public class Registry implements Node {
     @Override
     public void handleTaskInitiate(int num) {
         // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void handleDataTraffic(int num) {
         
     }
 }

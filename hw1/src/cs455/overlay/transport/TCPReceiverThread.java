@@ -6,6 +6,7 @@ import cs455.overlay.node.MessagingNode;
 import cs455.overlay.node.Node;
 import cs455.overlay.node.Registry;
 import cs455.overlay.wireformats.ConnectionsDirective;
+import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
@@ -48,6 +49,7 @@ public class TCPReceiverThread implements Runnable {
     }
 
     void handleEvent(int id, int dataLength, byte[] data) throws IOException {
+        System.out.println("handleEvent ID: " + Integer.toString(id));
         switch (id) {
             case Protocol.REGISTER_REQUEST:
                 Register register = new Register(data, dataLength);
@@ -66,11 +68,16 @@ public class TCPReceiverThread implements Runnable {
                 System.out.println("Connections Directive!");
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
+                break;
             case Protocol.TASK_INITIATE:
                 System.out.println("Task Initiate!");
                 TaskInitiate task = new TaskInitiate(data);
                 caller.handleTaskInitiate(task.sendMessages);
                 System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
+                break;
+            case Protocol.DATA_TRAFFIC:
+                DataTraffic traffic = new DataTraffic(data);
+                caller.handleDataTraffic(traffic.random);
             default:
                 break;
         }

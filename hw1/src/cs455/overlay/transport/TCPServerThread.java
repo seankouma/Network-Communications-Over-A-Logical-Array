@@ -15,6 +15,11 @@ public class TCPServerThread implements Runnable {
         this.caller = caller;
     }
 
+    public TCPServerThread(ServerSocket socket, Node caller) throws IOException {
+        server = socket;
+        this.caller = caller;
+    }
+
     @Override
     public void run() {
         System.out.println("Server started");
