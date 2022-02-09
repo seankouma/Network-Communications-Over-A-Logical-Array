@@ -1,5 +1,8 @@
 package cs455.overlay.node;
 
+import java.util.HashSet;
+import java.util.Random;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,12 +22,15 @@ import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.TaskInitiate;
 
+
 public class Registry implements Node {
 
     public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
 
     TCPServerThread server = null;
     TCPSender sender = null;
+
+
     Registry(int port) throws IOException {
         server = new TCPServerThread(port, this);
         Thread sthread = new Thread(server);
@@ -36,7 +42,7 @@ public class Registry implements Node {
             if (line.equals("list-messaging-nodes")) {
                 listNodes();
             } else if (line.equals("setup-overlay")) {
-                start();
+                setupOverlay();
             } else {
                 String pattern = "^start \\d*$";
                 Pattern r = Pattern.compile(pattern);
@@ -49,7 +55,7 @@ public class Registry implements Node {
         }
     }
 
-    public static void start() throws IOException {
+    public static void setupOverlay() throws IOException {
         ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(nodes.keySet()));
         for (int i = 0; i < keys.size() - 1; i++) {
             Socket next = nodes.get(keys.get(i+1));
@@ -75,14 +81,11 @@ public class Registry implements Node {
         for (Integer i : nodes.keySet()) {
             Socket current = nodes.get(i);
             System.out.println("Num: " + Integer.toString(i) + ", IP: " + current.getInetAddress().getHostAddress() + ", Port: " + Integer.toString(current.getPort()));
-            System.out.println();
         }
-        if (nodes.keySet().size() >= 4) start(); 
         return rand;
     }
 
     public void taskInitiate(int num) throws IOException {
-        System.out.println("THE HECK");
         TaskInitiate init = new TaskInitiate(num);
         byte[] data = init.getBytes();
         for (Socket s : nodes.values()) {
@@ -134,6 +137,6 @@ public class Registry implements Node {
 
     @Override
     public void handleDataTraffic(int num) {
-        
+
     }
 }

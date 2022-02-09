@@ -49,28 +49,22 @@ public class TCPReceiverThread implements Runnable {
     }
 
     void handleEvent(int id, int dataLength, byte[] data) throws IOException {
-        System.out.println("handleEvent ID: " + Integer.toString(id));
         switch (id) {
             case Protocol.REGISTER_REQUEST:
                 Register register = new Register(data, dataLength);
                 int identifier = Registry.register(register);
                 sendRegisterResponse(identifier);
-                System.out.println("Type: " + Integer.toString(register.getType()) + ", IP: " + register.getIp() + ", Port: " + Integer.toString(register.getPort()));
                 break;
         
             case Protocol.REGISTER_RESPONSE:
-                System.out.println("Response!");
                 RegisterResponse response = new RegisterResponse(data);
                 caller.setIdentifier(response.identifier);
-                System.out.println("Caller ID: " + Integer.toString(caller.getIdentifier()));
                 break;
             case Protocol.CONNECT:
-                System.out.println("Connections Directive!");
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
                 break;
             case Protocol.TASK_INITIATE:
-                System.out.println("Task Initiate!");
                 TaskInitiate task = new TaskInitiate(data);
                 caller.handleTaskInitiate(task.sendMessages);
                 System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
