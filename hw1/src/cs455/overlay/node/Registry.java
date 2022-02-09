@@ -21,6 +21,7 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.wireformats.Deregister;
 
 
 public class Registry implements Node {
@@ -29,7 +30,6 @@ public class Registry implements Node {
 
     TCPServerThread server = null;
     TCPSender sender = null;
-    public static HashSet<Integer> duplicateCheck = new HashSet<Integer>();
 
 
     Registry(int port) throws IOException {
@@ -96,10 +96,11 @@ public class Registry implements Node {
     }
 
     public static boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {
-        if( duplicateCheck.contains(id)) {
-            duplicateCheck.remove(id);
+        if(nodes.keySet().contains(id)){
+            nodes.keySet().remove(id);
             return true;
         }
+        System.out.println("In registry: Failed to derigster node due to invalid id");
         return false;
     }
     //derister check if id is valid
