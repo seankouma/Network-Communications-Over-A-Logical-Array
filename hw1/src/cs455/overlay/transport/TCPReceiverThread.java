@@ -66,15 +66,18 @@ public class TCPReceiverThread implements Runnable {
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
             case Protocol.DEREGISTER_REQUEST:
+                int boolNum = 0;
                 System.out.println("Deregister");
                 Deregister dereg = new Deregister(data, dataLength);
                 boolean isRegistered = Registry.deregister(dereg, dataLength);
                 if(isRegistered){
+                    boolNum = 1;
                  } //call shut down method in messagingNode
                 else{
                     System.out.println("This ID does not exist");
                     System.out.println("Failed to deregister node, try again");
                 }
+                sendRegisterResponse(boolNum);
                 break;
             default:
                 break;
