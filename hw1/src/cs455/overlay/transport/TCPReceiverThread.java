@@ -6,11 +6,13 @@ import cs455.overlay.node.MessagingNode;
 import cs455.overlay.node.Node;
 import cs455.overlay.node.Registry;
 import cs455.overlay.wireformats.ConnectionsDirective;
+import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
-import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.TaskInitiate;
+
 
 import java.io.*;
 
@@ -52,33 +54,24 @@ public class TCPReceiverThread implements Runnable {
                 Register register = new Register(data, dataLength);
                 int identifier = Registry.register(register);
                 sendRegisterResponse(identifier);
-                System.out.println("Type: " + Integer.toString(register.getType()) + ", IP: " + register.getIp() + ", Port: " + Integer.toString(register.getPort()));
                 break;
         
             case Protocol.REGISTER_RESPONSE:
-                System.out.println("Response!");
                 RegisterResponse response = new RegisterResponse(data);
                 caller.setIdentifier(response.identifier);
-                System.out.println("Caller ID: " + Integer.toString(caller.getIdentifier()));
                 break;
             case Protocol.CONNECT:
-                System.out.println("Connections Directive!");
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
                 caller.handleConnect(connect);
-            case Protocol.DEREGISTER_REQUEST:
-                int boolNum = 0;
-                System.out.println("Deregister");
-                Deregister dereg = new Deregister(data, dataLength);
-                boolean isRegistered = Registry.deregister(dereg, dataLength);
-                if(isRegistered){
-                    boolNum = 1;
-                 } //call shut down method in messagingNode
-                else{
-                    System.out.println("This ID does not exist");
-                    System.out.println("Failed to deregister node, try again");
-                }
-                sendRegisterResponse(boolNum);
                 break;
+            case Protocol.TASK_INITIATE:
+                TaskInitiate task = new TaskInitiate(data);
+                caller.handleTaskInitiate(task.sendMessages);
+                System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
+                break;
+            case Protocol.DATA_TRAFFIC:
+                DataTraffic traffic = new DataTraffic(data);
+                caller.handleDataTraffic(traffic.random);
             default:
                 break;
         }
@@ -86,7 +79,7 @@ public class TCPReceiverThread implements Runnable {
 
     void sendRegisterResponse(int identifier) throws IOException {
         byte[] bytes = getResponseBytes(identifier);
-        Socket socket = Registry.map.get(identifier);
+        Socket socket = Registry.nodes.get(identifier);
         TCPSender sender = new TCPSender(socket);
         sender.sendData(bytes);
     }
@@ -103,6 +96,4 @@ public class TCPReceiverThread implements Runnable {
         dout.close();
         return marshalledBytes;
     }
-
-    
 }

@@ -6,12 +6,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
+import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
 
 public class MessagingNode implements Node {
@@ -19,11 +22,11 @@ public class MessagingNode implements Node {
     public TCPSender sender = null;
     public int identifier = 0;
     Socket peerSocket = null;
+    TCPSender peerSender = null;
 
-    //add shut down method
-
-    MessagingNode(int selfPort, int otherPort) throws IOException, InterruptedException {
-        server = new TCPServerThread(selfPort, this);
+    MessagingNode(int otherPort) throws IOException, InterruptedException {
+        ServerSocket serverSocket = new ServerSocket(0);
+        server = new TCPServerThread(serverSocket, this);
         Thread sthread = new Thread(server);
         sthread.start();
         InetAddress addr = InetAddress.getByName("127.0.0.1");
@@ -42,7 +45,7 @@ public class MessagingNode implements Node {
         //     byte[] bytes = getBytes(line);
         //     sender.sendData(bytes);
         // }
-        Register register = new Register("127.0.0.1", selfPort);
+        Register register = new Register("127.0.0.1", serverSocket.getLocalPort());
         byte[] bytes = register.getBytes();
         sender.sendData(bytes);
     }
@@ -65,9 +68,8 @@ public class MessagingNode implements Node {
 
     // To run this, just pass in the port you want this node to use and the port it should communicate with as CLI parameters.
     public static void main(String[] args) throws IOException, InterruptedException {
-        int selfPort = Integer.parseInt(args[0]);
-        int otherPort = Integer.parseInt(args[1]);
-        MessagingNode node = new MessagingNode(selfPort, otherPort);
+        int otherPort = Integer.parseInt(args[0]);
+        MessagingNode node = new MessagingNode(otherPort);
     }
 
     @Override
@@ -84,7 +86,28 @@ public class MessagingNode implements Node {
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
         this.peerSocket = new Socket(connect.getIp(), connect.getPort());
         System.out.println("Connected to: " + Integer.toString(this.peerSocket.getPort()));
+        this.peerSender = new TCPSender(peerSocket);
         
+    }
+
+    @Override
+    public void handleTaskInitiate(int num) {
+        System.out.println("Messages to send from node: " + Integer.toString(num));
+        Random rand = new Random();
+        for (int i = 0; i < num; i++) {
+            DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
+            try {
+                this.peerSender.sendData(traffic.getBytes());
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void handleDataTraffic(int num) {
+        System.out.println("We received " + Integer.toString(num));
     }
     
 }
