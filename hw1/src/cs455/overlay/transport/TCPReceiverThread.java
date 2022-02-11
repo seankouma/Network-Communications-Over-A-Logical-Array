@@ -12,7 +12,7 @@ import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 import cs455.overlay.wireformats.TaskInitiate;
-
+import cs455.overlay.wireformats.Deregister;
 
 import java.io.*;
 
@@ -72,6 +72,15 @@ public class TCPReceiverThread implements Runnable {
             case Protocol.DATA_TRAFFIC:
                 DataTraffic traffic = new DataTraffic(data);
                 caller.handleDataTraffic(traffic.random);
+                break;
+            case Protocol.DEREGISTER_REQUEST:
+                int boolNum = 0;
+                System.out.println("Deregister");
+                Deregister dereg = new Deregister(data, dataLength);
+                boolean isRegistered = Registry.deregister(dereg, dataLength);
+                if(isRegistered) boolNum = 1;
+                sendRegisterResponse(boolNum);
+                break;
             default:
                 break;
         }

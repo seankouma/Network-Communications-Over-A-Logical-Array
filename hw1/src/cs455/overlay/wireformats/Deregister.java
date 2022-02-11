@@ -1,30 +1,55 @@
 package cs455.overlay.wireformats;
 
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.TreeSet;
 
-public class Register implements Protocol, Event {
-    int messageType = REGISTER_REQUEST;
-    String ip;
-    int port;
+import cs455.overlay.transport.TCPSender;
+import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.ConnectionsDirective;
 
-    // TODO remove these from being public and manage them from the factory instead
-    public Register(String ip, int port) {
+
+public class Deregister implements Protocol, Event{
+    public int messageType = DEREGISTER_REQUEST;
+    public String ip;
+    public int port;
+
+    public Deregister(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
 
-    public Register(byte[] marshalledBytes) throws IOException {
+    //check if ID valid
+
+    public Deregister(byte[] marshalledBytes) throws IOException {
+        ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
+        DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
+        port = din.readInt();
+        int ipLength = din.readInt();
+        byte[] ipBytes = new byte[ipLength];
+        ip = new String(ipBytes);
+        baInputStream.close();
+        din.close();
+    }
+
+    public Deregister(byte[] marshalledBytes, int dataLength) throws IOException {
         ByteArrayInputStream baInputStream =
         new ByteArrayInputStream(marshalledBytes);
         DataInputStream din =
         new DataInputStream(new BufferedInputStream(baInputStream));
-        messageType = din.readInt();
         int ipLength = din.readInt();
         byte[] ipBytes = new byte[ipLength];
         din.readFully(ipBytes);
@@ -33,21 +58,6 @@ public class Register implements Protocol, Event {
         baInputStream.close();
         din.close();
     }
-
-    public Register(byte[] marshalledBytes, int dataLength) throws IOException {
-        ByteArrayInputStream baInputStream =
-        new ByteArrayInputStream(marshalledBytes);
-        DataInputStream din =
-        new DataInputStream(new BufferedInputStream(baInputStream));
-        int ipLength = din.readInt();
-        byte[] ipBytes = new byte[ipLength];
-        din.readFully(ipBytes);
-        ip = new String(ipBytes);
-        port = din.readInt();
-        baInputStream.close();
-        din.close();
-    }
-
 
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;
@@ -67,15 +77,12 @@ public class Register implements Protocol, Event {
         return marshalledBytes;
     }
 
+    @Override
     public int getType() {
+        // TODO Auto-generated method stub
         return messageType;
     }
 
-    public String getIp() {
-        return this.ip;
-    }
 
-    public int getPort() {
-        return this.port;
-    }
+
 }
