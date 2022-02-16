@@ -11,5 +11,5 @@ public interface Node {
     void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException;
     void handleTaskInitiate(int num);
     void handleDataTraffic(int num);
-    void handleTaskComplete();
+    void handlePullTrafficSummary();
 }

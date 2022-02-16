@@ -13,6 +13,7 @@ import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.PullTrafficSummary;
 
 import java.io.*;
 
@@ -81,9 +82,8 @@ public class TCPReceiverThread implements Runnable {
                 if(isRegistered) boolNum = 1;
                 sendRegisterResponse(boolNum);
                 break;
-            case Protocol.TASK_COMPLETE:
-                TaskComplete tc = new TaskComplete(data);
-                caller.handleTaskComplete(tc);
+            case Protocol.PULL_TRAFFIC_SUMMARY:
+                caller.handlePullTrafficSummary();
                 break;
             default:
                 break;

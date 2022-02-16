@@ -8,17 +8,17 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class TaskComplete implements Protocol, Event {
+public class PullTrafficSummary implements Protocol, Event {
     int messageType = Protocol.DATA_TRAFFIC;
     public int random = 0;
     public int id = 0;
 
-    public TaskComplete(int num, int id) {
+    public PullTrafficSummary(int num, int id) {
         this.random = num;
         this.id = id;
     }
     
-    public TaskComplete(byte[] marshalledBytes) throws IOException {
+    public PullTrafficSummary(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
         random = din.readInt();

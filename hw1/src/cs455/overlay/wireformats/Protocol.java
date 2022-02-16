@@ -7,4 +7,5 @@ public interface Protocol {
     public static final int TASK_INITIATE = 3;
     public static final int DATA_TRAFFIC = 4;
     public static final int DEREGISTER_REQUEST = 5;
+    public static final int PULL_TRAFFIC_SUMMARY = 7;
 }

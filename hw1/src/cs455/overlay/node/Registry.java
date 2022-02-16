@@ -20,10 +20,9 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
-import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
-import cs455.overlay.wireformats.TaskComplete;
+import cs455.overlay.wireformats.PullTrafficSummary;
 
 
 public class Registry implements Node {
@@ -120,17 +119,9 @@ public class Registry implements Node {
         
     }
 
-    public void handleTaskComplete() {
-        ArrayList<TaskComplete> array = ArrayList<TaskComplete>();
-        if (array.size() == nodes.size()) {
-            // sendSummaryRequest();
-            System.out.println(array.size());
-        }
+    public void handlePullTrafficSummary() {
+        System.out.println("Hello\n");
     }
-
-    // public sendSummaryRequest() {
-
-    // }
 
     private void listNodes() {
         for (Socket socket : nodes.values()) {
