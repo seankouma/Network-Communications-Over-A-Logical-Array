@@ -16,6 +16,7 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskComplete;
 
 public class MessagingNode implements Node {
     TCPServerThread server = null;
@@ -103,11 +104,22 @@ public class MessagingNode implements Node {
                 e.printStackTrace();
             }
         }
+        this.sendTaskComplete();
+    }
+
+    public void sendTaskComplete() {
+        TaskComplete tc = new TaskComplete();
+        byte[] data = tc.getBytes();
+        sender.sendData(data);
     }
 
     @Override
     public void handleDataTraffic(int num) {
         System.out.println("We received " + Integer.toString(num));
     }
-    
+
+    @Override
+    public void handleTaskComplete() {
+        
+    }
 }

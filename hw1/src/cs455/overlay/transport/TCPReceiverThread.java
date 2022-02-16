@@ -81,6 +81,10 @@ public class TCPReceiverThread implements Runnable {
                 if(isRegistered) boolNum = 1;
                 sendRegisterResponse(boolNum);
                 break;
+            case Protocol.TASK_COMPLETE:
+                TaskComplete tc = new TaskComplete(data);
+                caller.handleTaskComplete(tc);
+                break;
             default:
                 break;
         }
