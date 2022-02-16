@@ -13,6 +13,7 @@ import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.TaskComplete;
 
 import java.io.*;
 
@@ -81,6 +82,20 @@ public class TCPReceiverThread implements Runnable {
                 if(isRegistered) boolNum = 1;
                 sendRegisterResponse(boolNum);
                 break;
+            case Protocol.TASK_COMPLETE:
+                System.out.println("Task complete");
+                TaskComplete completed = new TaskComplete(data);
+                caller.handleTaskComplete(completed.getIdentifier());
+                //sets task complete to registry
+                //adds to counter(thread safe) --all nodes
+                //check if nodes == counter (node sin overlay)
+                //registery sends summary req
+
+                //synchronize keyword
+                //methods(friday)/ 
+                break;
+
+
             default:
                 break;
         }
