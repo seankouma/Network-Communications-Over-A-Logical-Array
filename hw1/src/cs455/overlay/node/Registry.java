@@ -28,9 +28,9 @@ import cs455.overlay.wireformats.Deregister;
 public class Registry implements Node {
 
     public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
-
     TCPServerThread server = null;
     TCPSender sender = null;
+    int completed = 0;
 
 
     Registry(int port) throws IOException {
@@ -96,9 +96,11 @@ public class Registry implements Node {
         }
     }
 
-    public void taskComplete(int id) throws IOException{
-        TaskComplete done = new TaskComplete(id);
-        byte[] data = done.getBytes();
+    public void handleTaskComplete(int id) {
+        ++completed;
+        if (completed == nodes.size()) {
+            System.out.println("All nodes completed");
+        }
     }
 
     public static boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {

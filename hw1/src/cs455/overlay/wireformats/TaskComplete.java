@@ -10,23 +10,16 @@ import java.io.IOException;
 
 public class TaskComplete implements Protocol, Event {
     int messageType = Protocol.TASK_COMPLETE;
-    int identifier = 0;
-    String ip;
-    int port;
+    public int id = 0;
 
-    public TaskComplete(int identifer) {
-        this.identifier = identifer;
+    public TaskComplete(int id) {
+        this.id = id;
     }
     
     public TaskComplete(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
-        identifier = din.readInt();
-        int ipLength = din.readInt();
-        byte[] ipBytes = new byte[ipLength];
-        din.readFully(ipBytes);
-        ip = new String(ipBytes);
-        port = din.readInt();
+        id = din.readInt();
         baInputStream.close();
         din.close();
     }
@@ -37,12 +30,7 @@ public class TaskComplete implements Protocol, Event {
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
         dout.writeInt(this.messageType);
-        dout.writeInt(this.identifier);
-        byte[] ipBytes = ip.getBytes();
-        int elementLength = ipBytes.length;
-        dout.writeInt(elementLength);
-        dout.write(ipBytes);
-        dout.writeInt(this.port);
+        dout.writeInt(this.id);
         dout.flush();
         marshalledBytes = baOutputStream.toByteArray();
         baOutputStream.close();
@@ -55,9 +43,7 @@ public class TaskComplete implements Protocol, Event {
         return messageType;
     }
 
-    //make get method
-    public int getIdentifier(){
-        return identifier;
+    public int getIdentifier() {
+        return this.id;
     }
-
 }

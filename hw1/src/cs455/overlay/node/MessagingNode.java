@@ -16,12 +16,12 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskComplete;
 
 public class MessagingNode implements Node {
     TCPServerThread server = null;
     public TCPSender sender = null;
     public int identifier = 0;
-    public int total = 0;
     Socket peerSocket = null;
     TCPSender peerSender = null;
 
@@ -83,14 +83,6 @@ public class MessagingNode implements Node {
         return this.identifier;
     }
 
-    public void setTotal(int total){
-        this.total = total;
-    }
-
-    public int getTotal(){
-        return this.total;
-    }
-
     @Override
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
         this.peerSocket = new Socket(connect.getIp(), connect.getPort());
@@ -101,7 +93,6 @@ public class MessagingNode implements Node {
 
     @Override
     public void handleTaskInitiate(int num) {
-        setTotal(num);
         System.out.println("Messages to send from node: " + Integer.toString(num));
         Random rand = new Random();
         for (int i = 0; i < num; i++) {
@@ -109,23 +100,19 @@ public class MessagingNode implements Node {
             try {
                 this.peerSender.sendData(traffic.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
+        this.handleTaskComplete(this.identifier);
     }
 
     @Override
     public void handleTaskComplete(int id){
-        int total = getTotal();
-        if(total != 0){
-            if( id == this.identifier){
-                total--;
-            }
-            setTotal(total);
-        }
-        else{
-            //send to register?
+        TaskComplete tc = new TaskComplete(id);
+        try {
+            this.sender.sendData(tc.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

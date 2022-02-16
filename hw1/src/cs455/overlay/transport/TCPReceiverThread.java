@@ -68,7 +68,6 @@ public class TCPReceiverThread implements Runnable {
             case Protocol.TASK_INITIATE:
                 TaskInitiate task = new TaskInitiate(data);
                 caller.handleTaskInitiate(task.sendMessages);
-                System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
                 break;
             case Protocol.DATA_TRAFFIC:
                 DataTraffic traffic = new DataTraffic(data);
@@ -76,23 +75,14 @@ public class TCPReceiverThread implements Runnable {
                 break;
             case Protocol.DEREGISTER_REQUEST:
                 int boolNum = 0;
-                System.out.println("Deregister");
                 Deregister dereg = new Deregister(data, dataLength);
                 boolean isRegistered = Registry.deregister(dereg, dataLength);
                 if(isRegistered) boolNum = 1;
                 sendRegisterResponse(boolNum);
                 break;
             case Protocol.TASK_COMPLETE:
-                System.out.println("Task complete");
                 TaskComplete completed = new TaskComplete(data);
                 caller.handleTaskComplete(completed.getIdentifier());
-                //sets task complete to registry
-                //adds to counter(thread safe) --all nodes
-                //check if nodes == counter (node sin overlay)
-                //registery sends summary req
-
-                //synchronize keyword
-                //methods(friday)/ 
                 break;
 
 
