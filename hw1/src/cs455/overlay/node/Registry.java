@@ -20,6 +20,7 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
 
@@ -93,6 +94,11 @@ public class Registry implements Node {
             this.sender = new TCPSender(s);
             this.sender.sendData(data);
         }
+    }
+
+    public void taskComplete(int id) throws IOException{
+        TaskComplete done = new TaskComplete(id);
+        byte[] data = done.getBytes();
     }
 
     public static boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {
