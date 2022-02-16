@@ -83,6 +83,7 @@ public class TCPReceiverThread implements Runnable {
                 sendRegisterResponse(boolNum);
                 break;
             case Protocol.PULL_TRAFFIC_SUMMARY:
+                
                 caller.handlePullTrafficSummary();
                 break;
             default:

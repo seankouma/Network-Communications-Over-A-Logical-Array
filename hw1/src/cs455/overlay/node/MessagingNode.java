@@ -24,6 +24,10 @@ public class MessagingNode implements Node {
     public int identifier = 0;
     Socket peerSocket = null;
     TCPSender peerSender = null;
+    public int numOfMSent = 0;
+    public int numOfMReceived = 0;
+    public int sumOfSent = 0;
+    public int sumOfReceived = 0;
 
     MessagingNode(int otherPort) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(0);
@@ -98,9 +102,12 @@ public class MessagingNode implements Node {
         for (int i = 0; i < num; i++) {
             DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
             try {
+                this.numOfMSent += 1;
+                this.sumOfSent += traffic.random;
+                System.out.println("This node sent: " + traffic.random + " | Total sent: " 
+                                    + this.numOfMSent + " | Sum of sent: " + this.sumOfSent);
                 this.peerSender.sendData(traffic.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -108,7 +115,10 @@ public class MessagingNode implements Node {
 
     @Override
     public void handleDataTraffic(int num) {
-        System.out.println("We received " + Integer.toString(num));
+        this.numOfMReceived += 1;
+        this.sumOfReceived += num;
+        System.out.println("We received: " + Integer.toString(num) + " | Total Received: " 
+                            + this.numOfMReceived + " | Sum of Received: " + this.sumOfReceived);
     }
 
     @Override

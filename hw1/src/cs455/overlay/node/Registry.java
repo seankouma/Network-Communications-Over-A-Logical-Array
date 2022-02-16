@@ -119,10 +119,6 @@ public class Registry implements Node {
         
     }
 
-    public void handlePullTrafficSummary() {
-        System.out.println("Hello\n");
-    }
-
     private void listNodes() {
         for (Socket socket : nodes.values()) {
             System.out.println("Hostname: " + socket.getInetAddress().getHostName() + ", Port: " + Integer.toString(socket.getPort()));
@@ -131,30 +127,35 @@ public class Registry implements Node {
 
     @Override
     public void setIdentifier(int id) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public int getIdentifier() {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public void handleTaskInitiate(int num) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public void handleDataTraffic(int num) {
+        // Auto-generated method stub
+    }
 
+    @Override
+    public void handlePullTrafficSummary() {
+        // Auto-generated method stub
     }
 }
