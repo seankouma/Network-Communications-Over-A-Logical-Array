@@ -71,7 +71,7 @@ public class TCPReceiverThread implements Runnable {
                 break;
             case Protocol.DATA_TRAFFIC:
                 DataTraffic traffic = new DataTraffic(data);
-                caller.handleDataTraffic(traffic.random);
+                caller.handleDataTraffic(traffic);
                 break;
             case Protocol.DEREGISTER_REQUEST:
                 int boolNum = 0;

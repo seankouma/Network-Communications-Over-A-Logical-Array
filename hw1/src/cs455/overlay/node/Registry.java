@@ -19,6 +19,7 @@ import java.util.Random;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
+import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
@@ -157,7 +158,7 @@ public class Registry implements Node {
     }
 
     @Override
-    public void handleDataTraffic(int num) {
+    public void handleDataTraffic(DataTraffic traffic) {
 
     }
 }

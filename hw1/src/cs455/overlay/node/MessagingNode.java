@@ -24,6 +24,7 @@ public class MessagingNode implements Node {
     public int identifier = 0;
     Socket peerSocket = null;
     TCPSender peerSender = null;
+    private int received = 0;
 
     MessagingNode(int otherPort) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(0);
@@ -117,8 +118,17 @@ public class MessagingNode implements Node {
     }
 
     @Override
-    public void handleDataTraffic(int num) {
-        System.out.println("We received " + Integer.toString(num));
+    public void handleDataTraffic(DataTraffic traffic) {
+        if (traffic.id == this.identifier) return;
+        ++received;
+        System.out.println("Num received: " + Integer.toString(received));
+        try {
+            byte[] data = traffic.getBytes();
+            peerSender.sendData(traffic.getBytes());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
 }
