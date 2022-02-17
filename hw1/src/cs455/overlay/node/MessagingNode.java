@@ -147,9 +147,15 @@ public class MessagingNode implements Node {
         TrafficSummary summary = new TrafficSummary(this.numOfMSent, this.sumOfSent, this.numOfMReceived, this.sumOfReceived);
         try {
             this.sender.sendData(summary.getBytes());
+            this.numOfMSent = 0;
+            this.sumOfSent = 0;
+            this.numOfMReceived = 0;
+            this.sumOfReceived = 0;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
     }
 
     @Override
