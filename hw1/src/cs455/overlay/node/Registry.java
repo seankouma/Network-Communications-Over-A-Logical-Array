@@ -100,10 +100,16 @@ public class Registry implements Node {
         }
     }
 
-    public void handleTaskComplete(int id) {
+    public synchronized void handleTaskComplete(int id) {
         ++completed;
         if (completed == nodes.size()) {
             System.out.println("All nodes completed");
+            try {
+                
+                gatherTrafficSummaries();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -120,9 +126,17 @@ public class Registry implements Node {
     //tells node it can stop
     //othwrwise message node to try again
 
-    public static void gatherTrafficSummaries() throws IOException {
+    public void gatherTrafficSummaries() throws IOException {
+        //once done => wait with sleep() => send summaries
+        PullTrafficSummary trafficSummary = new PullTrafficSummary();
+        byte[] data = trafficSummary.getBytes();
+        for( Socket s: nodes.values()) {
+            this.sender = new TCPSender(s);
+            this.sender.sendData(data);
+        }
 
     }
+
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {

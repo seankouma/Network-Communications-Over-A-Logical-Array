@@ -127,7 +127,7 @@ public class MessagingNode implements Node {
     }
 
     @Override
-    public void handleDataTraffic(DataTraffic traffic) {
+    public synchronized void handleDataTraffic(DataTraffic traffic) {
         if (traffic.id == this.identifier) return;
         ++numOfMReceived;
         sumOfReceived += traffic.random;
