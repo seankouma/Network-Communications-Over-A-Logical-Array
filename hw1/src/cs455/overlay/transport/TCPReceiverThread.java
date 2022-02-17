@@ -13,6 +13,9 @@ import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.TaskComplete;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 import java.io.*;
 
@@ -67,19 +70,28 @@ public class TCPReceiverThread implements Runnable {
             case Protocol.TASK_INITIATE:
                 TaskInitiate task = new TaskInitiate(data);
                 caller.handleTaskInitiate(task.sendMessages);
-                System.out.println("Messages to send: " + Integer.toString(task.sendMessages));
                 break;
             case Protocol.DATA_TRAFFIC:
                 DataTraffic traffic = new DataTraffic(data);
-                caller.handleDataTraffic(traffic.random);
+                caller.handleDataTraffic(traffic);
                 break;
             case Protocol.DEREGISTER_REQUEST:
                 int boolNum = 0;
-                System.out.println("Deregister");
                 Deregister dereg = new Deregister(data, dataLength);
                 boolean isRegistered = Registry.deregister(dereg, dataLength);
                 if(isRegistered) boolNum = 1;
                 sendRegisterResponse(boolNum);
+                break;
+            case Protocol.TASK_COMPLETE:
+                TaskComplete completed = new TaskComplete(data);
+                caller.handleTaskComplete(completed.getIdentifier());
+                break;
+            case Protocol.PULL_TRAFFIC_SUMMARY:
+                caller.handlePullTrafficSummary();
+                break;
+            case Protocol.TRAFFIC_SUMMARY:
+                TrafficSummary summary = new TrafficSummary(data);
+                caller.handleTrafficSummary(summary);
                 break;
             default:
                 break;

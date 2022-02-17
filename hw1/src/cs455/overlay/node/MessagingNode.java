@@ -16,6 +16,9 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskComplete;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 public class MessagingNode implements Node {
     TCPServerThread server = null;
@@ -23,6 +26,10 @@ public class MessagingNode implements Node {
     public int identifier = 0;
     Socket peerSocket = null;
     TCPSender peerSender = null;
+    public int numOfMSent = 0;
+    public int numOfMReceived = 0;
+    public int sumOfSent = 0;
+    public int sumOfReceived = 0;
 
     MessagingNode(int otherPort) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(0);
@@ -97,17 +104,56 @@ public class MessagingNode implements Node {
         for (int i = 0; i < num; i++) {
             DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
             try {
+                this.numOfMSent += 1;
+                this.sumOfSent += traffic.random;
+                System.out.println("This node sent: " + traffic.random + " | Total sent: " 
+                                    + this.numOfMSent + " | Sum of sent: " + this.sumOfSent);
                 this.peerSender.sendData(traffic.getBytes());
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        }
+        this.handleTaskComplete(this.identifier);
+    }
+
+    @Override
+    public void handleTaskComplete(int id){
+        TaskComplete tc = new TaskComplete(id);
+        try {
+            this.sender.sendData(tc.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void handleDataTraffic(int num) {
-        System.out.println("We received " + Integer.toString(num));
+    public void handleDataTraffic(DataTraffic traffic) {
+        if (traffic.id == this.identifier) return;
+        ++numOfMReceived;
+        sumOfReceived += traffic.random;
+        System.out.println("We received: " + Integer.toString(traffic.random) + " | Total Received: " 
+                            + this.numOfMReceived + " | Sum of Received: " + this.sumOfReceived);
+        try {
+            byte[] data = traffic.getBytes();
+            peerSender.sendData(traffic.getBytes());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-    
+
+    @Override
+    public void handlePullTrafficSummary() {
+        TrafficSummary summary = new TrafficSummary(this.numOfMSent, this.sumOfSent, this.numOfMReceived, this.sumOfReceived);
+        try {
+            this.sender.sendData(summary.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void handleTrafficSummary(TrafficSummary summary) {
+
+    }
 }

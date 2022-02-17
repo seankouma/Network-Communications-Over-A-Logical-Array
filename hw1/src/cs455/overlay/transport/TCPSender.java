@@ -11,7 +11,7 @@ public class TCPSender {
         dout = new DataOutputStream(socket.getOutputStream());
     }
 
-    public void sendData(byte[] dataToSend) throws IOException {
+    public synchronized void sendData(byte[] dataToSend) throws IOException {
         /* This method doesn't need its own thread because it doesn't need to always be polling, unlike the TCPServerThread and TCPReceiverThread */
         int dataLength = dataToSend.length;
         dout.writeInt(dataLength);

@@ -19,17 +19,22 @@ import java.util.Random;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
+import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.wireformats.TrafficSummary;
 import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 
 public class Registry implements Node {
 
     public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
-
     TCPServerThread server = null;
     TCPSender sender = null;
+    int completed = 0;
 
 
     Registry(int port) throws IOException {
@@ -95,6 +100,13 @@ public class Registry implements Node {
         }
     }
 
+    public void handleTaskComplete(int id) {
+        ++completed;
+        if (completed == nodes.size()) {
+            System.out.println("All nodes completed");
+        }
+    }
+
     public static boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {
         if(nodes.keySet().contains(id)){
             nodes.keySet().remove(id);
@@ -103,10 +115,14 @@ public class Registry implements Node {
         System.out.println("In registry: Failed to derigster node due to invalid id");
         return false;
     }
+
     //derister check if id is valid
     //tells node it can stop
     //othwrwise message node to try again
 
+    public static void gatherTrafficSummaries() throws IOException {
+
+    }
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {
@@ -115,7 +131,6 @@ public class Registry implements Node {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
     }
 
     private void listNodes() {
@@ -125,31 +140,39 @@ public class Registry implements Node {
     }
 
     @Override
+    public void handleTrafficSummary(TrafficSummary summary) {
+        
+    }
+
+    @Override
     public void setIdentifier(int id) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public int getIdentifier() {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public void handleTaskInitiate(int num) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
-    public void handleDataTraffic(int num) {
+    public void handleDataTraffic(DataTraffic traffic) {}
 
+    @Override
+    public void handlePullTrafficSummary() {
+        // Auto-generated method stub
     }
 }
