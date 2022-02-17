@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
+import cs455.overlay.wireformats.*;
 
 public interface Node {
     void setIdentifier(int id);
@@ -13,4 +14,6 @@ public interface Node {
     void handleTaskInitiate(int num);
     void handleDataTraffic(DataTraffic traffic);
     void handleTaskComplete(int id);
+    void handlePullTrafficSummary();
+    void handleTrafficSummary(TrafficSummary summary);
 }

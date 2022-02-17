@@ -14,6 +14,8 @@ import cs455.overlay.wireformats.RegisterResponse;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.Deregister;
 import cs455.overlay.wireformats.TaskComplete;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 import java.io.*;
 
@@ -84,8 +86,13 @@ public class TCPReceiverThread implements Runnable {
                 TaskComplete completed = new TaskComplete(data);
                 caller.handleTaskComplete(completed.getIdentifier());
                 break;
-
-
+            case Protocol.PULL_TRAFFIC_SUMMARY:
+                caller.handlePullTrafficSummary();
+                break;
+            case Protocol.TRAFFIC_SUMMARY:
+                TrafficSummary summary = new TrafficSummary(data);
+                caller.handleTrafficSummary(summary);
+                break;
             default:
                 break;
         }

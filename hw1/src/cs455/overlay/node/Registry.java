@@ -23,7 +23,10 @@ import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.wireformats.TrafficSummary;
 import cs455.overlay.wireformats.Deregister;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 
 public class Registry implements Node {
@@ -112,10 +115,14 @@ public class Registry implements Node {
         System.out.println("In registry: Failed to derigster node due to invalid id");
         return false;
     }
+
     //derister check if id is valid
     //tells node it can stop
     //othwrwise message node to try again
 
+    public static void gatherTrafficSummaries() throws IOException {
+
+    }
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {
@@ -124,7 +131,6 @@ public class Registry implements Node {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
     }
 
     private void listNodes() {
@@ -134,31 +140,39 @@ public class Registry implements Node {
     }
 
     @Override
+    public void handleTrafficSummary(TrafficSummary summary) {
+        
+    }
+
+    @Override
     public void setIdentifier(int id) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public int getIdentifier() {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
     public void handleTaskInitiate(int num) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         
     }
 
     @Override
-    public void handleDataTraffic(DataTraffic traffic) {
+    public void handleDataTraffic(DataTraffic traffic) {}
 
+    @Override
+    public void handlePullTrafficSummary() {
+        // Auto-generated method stub
     }
 }
