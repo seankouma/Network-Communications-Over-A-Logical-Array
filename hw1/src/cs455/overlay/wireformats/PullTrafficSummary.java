@@ -9,20 +9,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class PullTrafficSummary implements Protocol, Event {
-    int messageType = Protocol.DATA_TRAFFIC;
+    int messageType = Protocol.PULL_TRAFFIC_SUMMARY;
     public int random = 0;
     public int id = 0;
 
-    public PullTrafficSummary(int num, int id) {
-        this.random = num;
-        this.id = id;
+    public PullTrafficSummary() {
+
     }
     
     public PullTrafficSummary(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
-        random = din.readInt();
-        id = din.readInt();
         baInputStream.close();
         din.close();
     }
@@ -33,8 +30,6 @@ public class PullTrafficSummary implements Protocol, Event {
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
         dout.writeInt(this.messageType);
-        dout.writeInt(this.random);
-        dout.writeInt(this.id);
         dout.flush();
         marshalledBytes = baOutputStream.toByteArray();
         baOutputStream.close();

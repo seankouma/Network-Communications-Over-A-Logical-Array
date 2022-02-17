@@ -17,6 +17,7 @@ import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 public class MessagingNode implements Node {
     TCPServerThread server = null;
@@ -123,6 +124,16 @@ public class MessagingNode implements Node {
 
     @Override
     public void handlePullTrafficSummary() {
-        
+        TrafficSummary summary = new TrafficSummary(this.numOfMSent, this.sumOfSent, this.numOfMReceived, this.sumOfReceived);
+        try {
+            this.sender.sendData(summary.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void handleTrafficSummary(TrafficSummary summary) {
+
     }
 }

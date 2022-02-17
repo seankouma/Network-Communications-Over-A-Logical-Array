@@ -21,8 +21,10 @@ import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.wireformats.TrafficSummary;
 import cs455.overlay.wireformats.Deregister;
 import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TrafficSummary;
 
 
 public class Registry implements Node {
@@ -104,10 +106,14 @@ public class Registry implements Node {
         System.out.println("In registry: Failed to derigster node due to invalid id");
         return false;
     }
+
     //derister check if id is valid
     //tells node it can stop
     //othwrwise message node to try again
 
+    public static void gatherTrafficSummaries() throws IOException {
+
+    }
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {
@@ -123,6 +129,11 @@ public class Registry implements Node {
         for (Socket socket : nodes.values()) {
             System.out.println("Hostname: " + socket.getInetAddress().getHostName() + ", Port: " + Integer.toString(socket.getPort()));
         }
+    }
+
+    @Override
+    public void handleTrafficSummary(TrafficSummary summary) {
+        
     }
 
     @Override
