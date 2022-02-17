@@ -104,8 +104,7 @@ public class Registry implements Node {
         ++completed;
         if (completed == nodes.size()) {
             System.out.println("All nodes completed");
-            try {
-                
+            try {   
                 gatherTrafficSummaries();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -128,6 +127,11 @@ public class Registry implements Node {
 
     public void gatherTrafficSummaries() throws IOException {
         //once done => wait with sleep() => send summaries
+        try {
+            this.wait(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         PullTrafficSummary trafficSummary = new PullTrafficSummary();
         byte[] data = trafficSummary.getBytes();
         for( Socket s: nodes.values()) {
@@ -155,6 +159,7 @@ public class Registry implements Node {
 
     @Override
     public void handleTrafficSummary(TrafficSummary summary) {
+        //output to print
         
     }
 
