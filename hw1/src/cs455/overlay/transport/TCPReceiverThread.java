@@ -37,7 +37,7 @@ public class TCPReceiverThread implements Runnable {
             try {
                 dataLength = input.readInt();
                 int id = input.readInt();
-                System.out.println("Message Type: " + Integer.toString(id) + " message length: " + Integer.toString(dataLength));
+                // System.out.println("Message Type: " + Integer.toString(id) + " message length: " + Integer.toString(dataLength));
                 byte[] data = new byte[dataLength-4];
                 input.readFully(data, 0, dataLength-4);
                 handleEvent(id, dataLength-4, data);

@@ -128,17 +128,18 @@ public class Registry implements Node {
     public void gatherTrafficSummaries() throws IOException {
         //once done => wait with sleep() => send summaries
         try {
-            this.wait(100);
+            this.wait(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         PullTrafficSummary trafficSummary = new PullTrafficSummary();
         byte[] data = trafficSummary.getBytes();
+        System.out.println("getting summaries");
         for( Socket s: nodes.values()) {
             this.sender = new TCPSender(s);
             this.sender.sendData(data);
         }
-
+        System.out.println("      | Num Sent Messages | Num Messages Recieved | Sum of Sent | Sum of Recieved |");
     }
 
     public static void main(String[] args) {
@@ -160,8 +161,8 @@ public class Registry implements Node {
     @Override
     public void handleTrafficSummary(TrafficSummary summary) {
         //output to print
-        System.out.println("      | Num Sent Messages | Num Messages Recieved | Sum of Sent | Sum of Recieved |");
-        System.out.println("Node  | " + summary.numOfMSent + " | " + summary.numOfMReceived + " | " + summary.sumOfSent + " | " + summary.sumOfReceived + " |");    );
+        // System.out.println("Node  | " + summary.numOfMSent + " | " + summary.numOfMReceived + " | " + summary.sumOfSent + " | " + summary.sumOfReceived + " |");
+        System.out.format("Node  |%19d|%23d|%13d|%17d|\n", summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
     }
 
     @Override
