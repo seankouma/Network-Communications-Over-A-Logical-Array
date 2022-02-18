@@ -160,7 +160,8 @@ public class Registry implements Node {
     @Override
     public void handleTrafficSummary(TrafficSummary summary) {
         //output to print
-        
+        System.out.println("      | Num Sent Messages | Num Messages Recieved | Sum of Sent | Sum of Recieved |");
+        System.out.println("Node  | " + summary.numOfMSent + " | " + summary.numOfMReceived + " | " + summary.sumOfSent + " | " + summary.sumOfReceived + " |");    );
     }
 
     @Override
