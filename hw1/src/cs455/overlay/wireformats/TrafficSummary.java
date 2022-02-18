@@ -10,6 +10,8 @@ import java.io.IOException;
 
 public class TrafficSummary implements Protocol, Event {
     int messageType = Protocol.DATA_TRAFFIC;
+    String ip;
+    int port;
     public int numOfMSent = 0;
     public int sumOfSent = 0;
     public int numOfMReceived = 0;
