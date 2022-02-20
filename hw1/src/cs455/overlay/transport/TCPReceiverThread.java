@@ -5,18 +5,7 @@ import java.net.*;
 import cs455.overlay.node.MessagingNode;
 import cs455.overlay.node.Node;
 import cs455.overlay.node.Registry;
-import cs455.overlay.wireformats.ConnectionsDirective;
-import cs455.overlay.wireformats.DataTraffic;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.Protocol;
-import cs455.overlay.wireformats.Register;
-import cs455.overlay.wireformats.RegisterResponse;
-import cs455.overlay.wireformats.TaskInitiate;
-import cs455.overlay.wireformats.Deregister;
-import cs455.overlay.wireformats.TaskComplete;
-import cs455.overlay.wireformats.PullTrafficSummary;
-import cs455.overlay.wireformats.TrafficSummary;
-
+import cs455.overlay.wireformats.*;
 import java.io.*;
 
 public class TCPReceiverThread implements Runnable {
@@ -51,7 +40,7 @@ public class TCPReceiverThread implements Runnable {
         }
     }
 
-    void handleEvent(int id, int dataLength, byte[] data) throws IOException {
+    synchronized void handleEvent(int id, int dataLength, byte[] data) throws IOException {
         switch (id) {
             case Protocol.REGISTER_REQUEST:
                 Register register = new Register(data, dataLength);
@@ -62,6 +51,7 @@ public class TCPReceiverThread implements Runnable {
             case Protocol.REGISTER_RESPONSE:
                 RegisterResponse response = new RegisterResponse(data);
                 caller.setIdentifier(response.identifier);
+                System.out.println("Successful registration. ID is: " + Integer.toString(response.identifier));
                 break;
             case Protocol.CONNECT:
                 ConnectionsDirective connect = new ConnectionsDirective(data, dataLength);
@@ -72,15 +62,11 @@ public class TCPReceiverThread implements Runnable {
                 caller.handleTaskInitiate(task.sendMessages);
                 break;
             case Protocol.DATA_TRAFFIC:
-                DataTraffic traffic = new DataTraffic(data);
-                caller.handleDataTraffic(traffic);
+                caller.handleDataTraffic(data);
                 break;
             case Protocol.DEREGISTER_REQUEST:
-                int boolNum = 0;
                 Deregister dereg = new Deregister(data, dataLength);
-                boolean isRegistered = Registry.deregister(dereg, dataLength);
-                if(isRegistered) boolNum = 1;
-                sendRegisterResponse(boolNum);
+                caller.deregister(dereg, dataLength);
                 break;
             case Protocol.TASK_COMPLETE:
                 TaskComplete completed = new TaskComplete(data);
@@ -92,6 +78,10 @@ public class TCPReceiverThread implements Runnable {
             case Protocol.TRAFFIC_SUMMARY:
                 TrafficSummary summary = new TrafficSummary(data);
                 caller.handleTrafficSummary(summary);
+                break;
+            case Protocol.DEREGISTER_RESPONSE:
+                DeregisterResponse resp = new DeregisterResponse(data, dataLength);
+                this.caller.handleDeregister(resp.getStatus());
                 break;
             default:
                 break;

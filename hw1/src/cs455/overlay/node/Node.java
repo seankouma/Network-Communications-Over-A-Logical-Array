@@ -12,8 +12,10 @@ public interface Node {
     int getIdentifier();
     void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException;
     void handleTaskInitiate(int num);
-    void handleDataTraffic(DataTraffic traffic);
+    void handleDataTraffic(byte[] data);
     void handleTaskComplete(int id);
     void handlePullTrafficSummary();
     void handleTrafficSummary(TrafficSummary summary);
+    void handleDeregister(String status);
+    boolean deregister(Deregister dr, int st) throws UnknownHostException, IOException;
 }

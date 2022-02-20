@@ -8,19 +8,33 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ConnectionsDirective implements Protocol, Event {
-    int messageType = CONNECT;
-    String ip;
+public class DeregisterResponse implements Protocol, Event {
+    int messageType = DEREGISTER_RESPONSE;
+    String status;
     int port;
-    int id;
 
-    public ConnectionsDirective(String ip, int port, int id) {
-        this.ip = ip;
+    // TODO remove these from being public and manage them from the factory instead
+    public DeregisterResponse(String status, int port) {
+        this.status = status;
         this.port = port;
-        this.id = id;
     }
 
-    public ConnectionsDirective(byte[] marshalledBytes, int dataLength) throws IOException {
+    public DeregisterResponse(byte[] marshalledBytes) throws IOException {
+        ByteArrayInputStream baInputStream =
+        new ByteArrayInputStream(marshalledBytes);
+        DataInputStream din =
+        new DataInputStream(new BufferedInputStream(baInputStream));
+        messageType = din.readInt();
+        int ipLength = din.readInt();
+        byte[] ipBytes = new byte[ipLength];
+        din.readFully(ipBytes);
+        status = new String(ipBytes);
+        port = din.readInt();
+        baInputStream.close();
+        din.close();
+    }
+
+    public DeregisterResponse(byte[] marshalledBytes, int dataLength) throws IOException {
         ByteArrayInputStream baInputStream =
         new ByteArrayInputStream(marshalledBytes);
         DataInputStream din =
@@ -28,12 +42,12 @@ public class ConnectionsDirective implements Protocol, Event {
         int ipLength = din.readInt();
         byte[] ipBytes = new byte[ipLength];
         din.readFully(ipBytes);
-        ip = new String(ipBytes);
+        status = new String(ipBytes);
         port = din.readInt();
-        id = din.readInt();
         baInputStream.close();
         din.close();
     }
+
 
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;
@@ -41,12 +55,11 @@ public class ConnectionsDirective implements Protocol, Event {
         DataOutputStream dout =
         new DataOutputStream(new BufferedOutputStream(baOutputStream));
         dout.writeInt(messageType);
-        byte[] ipBytes = ip.getBytes();
+        byte[] ipBytes = status.getBytes();
         int elementLength = ipBytes.length;
         dout.writeInt(elementLength);
         dout.write(ipBytes);
         dout.writeInt(port);
-        dout.writeInt(id);
         dout.flush();
         marshalledBytes = baOutputStream.toByteArray();
         baOutputStream.close();
@@ -58,15 +71,11 @@ public class ConnectionsDirective implements Protocol, Event {
         return messageType;
     }
 
-    public String getIp() {
-        return this.ip;
+    public String getStatus() {
+        return this.status;
     }
 
     public int getPort() {
         return this.port;
-    }
-
-    public int getID() {
-        return this.id;
     }
 }
