@@ -5,6 +5,9 @@ import java.util.Random;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -27,7 +30,7 @@ public class Registry implements Node {
     public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
     TCPServerThread server = null;
     TCPSender sender = null;
-    int completed = 0;
+    volatile int completed = 0;
 
     BigInteger totalSent = new BigInteger("0");
     BigInteger totalReceived = new BigInteger("0");
@@ -65,6 +68,7 @@ public class Registry implements Node {
         int max = 1024;
         Integer rand = r.nextInt(max);
         while (nodes.keySet().contains(rand)) rand = r.nextInt(max);
+	System.out.println(register.getIp());
         Socket socket = new Socket(register.getIp(), register.getPort());
         nodes.put(rand, socket);
         System.out.println("Registration request successful. The number of messaging nodes currently constituting the overlay is (" + Integer.toString(nodes.size()) + ")");
@@ -111,14 +115,40 @@ public class Registry implements Node {
         }
     }
 
-    public synchronized void handleTaskComplete(int id) {
+    @Override
+    public void handleEvent(int id, int dataLength, byte[] data) throws IOException {
+        switch (id) {
+            case Protocol.REGISTER_REQUEST:
+                Register register = new Register(data, dataLength);
+                int identifier = Registry.register(register);
+                sendRegisterResponse(identifier);
+                break;
+            case Protocol.DEREGISTER_REQUEST:
+                Deregister dereg = new Deregister(data, dataLength);
+                deregister(dereg, dataLength);
+                break;
+            case Protocol.TASK_COMPLETE:
+                TaskComplete completed = new TaskComplete(data);
+                handleTaskComplete(completed.getIdentifier());
+                break;
+            case Protocol.TRAFFIC_SUMMARY:
+                TrafficSummary summary = new TrafficSummary(data);
+                handleTrafficSummary(summary);
+                break;
+            default:
+                System.out.println("You missed something: " + Integer.toString(id));
+                break;
+        }
+    }
+
+    public void handleTaskComplete(int id) {
         ++completed;
         System.out.println("Node completed");
         if (completed == nodes.size()) {
+            completed = 0;
             System.out.println("All nodes completed");
             try {   
                 gatherTrafficSummaries();
-                completed = 0;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -127,7 +157,7 @@ public class Registry implements Node {
 
     public void gatherTrafficSummaries() throws IOException {
         try {
-            this.wait(15000); // Waits 15 seconds
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -147,7 +177,6 @@ public class Registry implements Node {
         }
     }
 
-    @Override
     public synchronized void handleTrafficSummary(TrafficSummary summary) {
         ++completed;
         this.sumSent = sumSent.add(new BigInteger(Integer.toString(summary.sumOfSent)));
@@ -161,6 +190,26 @@ public class Registry implements Node {
         }
     }
 
+    void sendRegisterResponse(int identifier) throws IOException {
+        byte[] bytes = getRegisterResponseBytes(identifier);
+        Socket socket = Registry.nodes.get(identifier);
+        TCPSender sender = new TCPSender(socket);
+        sender.sendData(bytes);
+    }
+
+    public byte[] getRegisterResponseBytes(int identifier) throws IOException {
+        byte[] marshalledBytes = null;
+        ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
+        dout.writeInt(Protocol.REGISTER_RESPONSE);
+        dout.writeInt(identifier);
+        dout.flush();
+        marshalledBytes = baOutputStream.toByteArray();
+        baOutputStream.close();
+        dout.close();
+        return marshalledBytes;
+    }
+
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
         try {
@@ -168,43 +217,5 @@ public class Registry implements Node {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void setIdentifier(int id) {
-        // Auto-generated method stub
-        
-    }
-
-    @Override
-    public int getIdentifier() {
-        // Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
-        // Auto-generated method stub
-        
-    }
-
-    @Override
-    public void handleTaskInitiate(int num) {
-        // Auto-generated method stub
-        
-    }
-
-    @Override
-    public void handleDataTraffic(byte[] traffic) {}
-
-    @Override
-    public void handlePullTrafficSummary() {
-        // Auto-generated method stub
-    }
-
-    @Override
-    public void handleDeregister(String status) {
-        // TODO Auto-generated method stub
-        
     }
 }
