@@ -13,7 +13,6 @@ public class DeregisterResponse implements Protocol, Event {
     String status;
     int port;
 
-    // TODO remove these from being public and manage them from the factory instead
     public DeregisterResponse(String status, int port) {
         this.status = status;
         this.port = port;

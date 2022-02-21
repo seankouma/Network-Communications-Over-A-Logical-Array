@@ -2,10 +2,7 @@ package cs455.overlay.transport;
 
 import java.net.*;
 
-import cs455.overlay.node.MessagingNode;
 import cs455.overlay.node.Node;
-import cs455.overlay.node.Registry;
-import cs455.overlay.wireformats.*;
 import java.io.*;
 
 public class TCPReceiverThread implements Runnable {
@@ -26,7 +23,6 @@ public class TCPReceiverThread implements Runnable {
             try {
                 dataLength = input.readInt();
                 int id = input.readInt();
-                // System.out.println("Message Type: " + Integer.toString(id) + " message length: " + Integer.toString(dataLength));
                 byte[] data = new byte[dataLength-4];
                 input.readFully(data, 0, dataLength-4);
                 caller.handleEvent(id, dataLength-4, data);

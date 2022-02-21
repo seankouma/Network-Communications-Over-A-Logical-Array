@@ -30,10 +30,11 @@ public class MessagingNodeHelper implements Runnable {
         for (int i = 0; i < num; i++) {
             DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
             try {
+                if (i % 50000 == 0) Thread.sleep(2000);
                 this.numOfMSent += 1;
                 this.sumOfSent += traffic.random;
                 this.sender.sendData(traffic.getBytes());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

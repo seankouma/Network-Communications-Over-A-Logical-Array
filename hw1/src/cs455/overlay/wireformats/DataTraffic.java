@@ -9,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class DataTraffic implements Protocol, Event {
-    int messageType = Protocol.DATA_TRAFFIC;
+    int messageType = DATA_TRAFFIC;
     public int random = 0;
     public int id = 0;
 

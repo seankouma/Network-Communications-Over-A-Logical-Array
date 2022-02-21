@@ -1,27 +1,15 @@
 package cs455.overlay.node;
-
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Queue;
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Stack;
-import java.util.Random;
-import java.util.ArrayDeque;
 
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.*;
-import cs455.overlay.node.*;
 
 public class MessagingNode implements Node {
     TCPServerThread server = null;
@@ -33,9 +21,7 @@ public class MessagingNode implements Node {
     public int numOfMReceived = 0;
     public int sumOfSent = 0;
     public int sumOfReceived = 0;
-    private boolean complete = false;
     private MessagingNodeHelper helper = null;
-    public ArrayDeque<DataTraffic> queue = new ArrayDeque<DataTraffic>(1250000);
 
     MessagingNode(String hostname, int otherPort) throws IOException, InterruptedException {
         ServerSocket serverSocket = new ServerSocket(0);
@@ -84,9 +70,6 @@ public class MessagingNode implements Node {
                 this.helper = new MessagingNodeHelper(this.peerSender, this, this.identifier, task.sendMessages);
                 Thread td = new Thread(helper);
                 td.start();
-                // MessageForwarder helper2 = new MessageForwarder(this.peerSender, this);
-                // Thread td2 = new Thread(helper2);
-                // td2.start();
                 break;
             case Protocol.DATA_TRAFFIC:
                 handleDataTraffic(data);
@@ -103,42 +86,12 @@ public class MessagingNode implements Node {
                 break;
         }
     }
-    public static void main(String[] args) throws IOException, InterruptedException {
-        int otherPort = Integer.parseInt(args[1]);
-        MessagingNode node = new MessagingNode(args[0], otherPort);
-    }
-
-    public void setIdentifier(int id) {
-        this.identifier = id;
-    }
-
-    public int getIdentifier() {
-        return this.identifier;
-    }
 
     public void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException {
         this.peerSocket = new Socket(connect.getIp(), connect.getPort());
         System.out.println("Connected to: " + Integer.toString(connect.getID()));
         this.peerSender = new TCPSender(peerSocket);
     }
-
-    // public void handleTaskInitiate(int num) {
-    //     System.out.println("Messages to send from node: " + Integer.toString(num));
-    //     Random rand = new Random();
-    //     for (int i = 0; i < num; i++) {
-    //         DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
-    //         try {
-    //             this.numOfMSent += 1;
-    //             this.sumOfSent += traffic.random;
-    //             this.sendDataTraffic(traffic);
-    //         } catch (IOException e) {
-    //             e.printStackTrace();
-    //         }
-    //     }
-    //     System.out.println("NODE FINISHED");
-    //     this.handleTaskComplete(this.identifier);
-    //     this.complete = true;
-    // }
 
     public void handleDataTraffic(byte[] data) {
         try {
@@ -148,21 +101,11 @@ public class MessagingNode implements Node {
             if (this.numOfMReceived % 10000 == 0) {
                 System.out.println("Total Received: " + this.numOfMReceived + " | ID: " + traffic.id + " My ID: " + this.identifier);
             }
-            // if (traffic.id != this.identifier) {
-            //     if (queue.size() > 2000000) Thread.sleep(50);
-            //     queue.push(traffic);
-            // }
             if (traffic.id != this.identifier) peerSender.sendData(traffic.getBytes());
             
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    void sendDataTraffic(DataTraffic traffic) throws IOException {
-        byte[] data = traffic.getBytes();
-        this.peerSender.sendData(data);
     }
 
     public void handleTaskComplete(int id){
@@ -187,11 +130,19 @@ public class MessagingNode implements Node {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
     }
 
     public void handleDeregister(String status) {
         System.out.println(status);
         System.exit(0);
+    }
+
+    public void setIdentifier(int id) {
+        this.identifier = id;
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        int otherPort = Integer.parseInt(args[1]);
+        MessagingNode node = new MessagingNode(args[0], otherPort);
     }
 }
