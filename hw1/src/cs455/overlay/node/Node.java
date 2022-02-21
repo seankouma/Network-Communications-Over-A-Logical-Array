@@ -5,15 +5,9 @@ import java.net.UnknownHostException;
 
 import cs455.overlay.wireformats.ConnectionsDirective;
 import cs455.overlay.wireformats.DataTraffic;
+import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.*;
 
 public interface Node {
-    void setIdentifier(int id);
-    int getIdentifier();
-    void handleConnect(ConnectionsDirective connect) throws UnknownHostException, IOException;
-    void handleTaskInitiate(int num);
-    void handleDataTraffic(DataTraffic traffic);
-    void handleTaskComplete(int id);
-    void handlePullTrafficSummary();
-    void handleTrafficSummary(TrafficSummary summary);
+    void handleEvent(int id, int dataLength, byte[] data) throws IOException;
 }

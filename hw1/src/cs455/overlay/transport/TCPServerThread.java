@@ -24,12 +24,9 @@ public class TCPServerThread implements Runnable {
     public void run() {
         System.out.println("Server started");
 
-        System.out.println("Waiting for client");
-
         try {
             while (true) {
                 socket = server.accept();
-                System.out.println("Client accepted");
                 // Spawn another thread to accept incoming packets to the port
                 TCPReceiverThread receiver = new TCPReceiverThread(socket, this.caller);
                 Thread rthread = new Thread(receiver);
