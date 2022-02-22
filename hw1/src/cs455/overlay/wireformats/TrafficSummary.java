@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class TrafficSummary implements Protocol, Event {
     int messageType = Protocol.TRAFFIC_SUMMARY;
-    String ip;
+    public String hostname;
     int port;
     public int numOfMSent = 0;
     public int sumOfSent = 0;
@@ -19,16 +19,21 @@ public class TrafficSummary implements Protocol, Event {
     
     
 
-    public TrafficSummary(int numOfMSent, int sumOfSent, int numOfMReceived, int sumOfReceived) {
+    public TrafficSummary(int numOfMSent, int sumOfSent, int numOfMReceived, int sumOfReceived, String hostname) {
         this.numOfMSent = numOfMSent;
         this.sumOfSent = sumOfSent;
         this.numOfMReceived = numOfMReceived;
         this.sumOfReceived = sumOfReceived;
+        this.hostname = hostname;
     }
     
     public TrafficSummary(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream baInputStream = new ByteArrayInputStream(marshalledBytes);
         DataInputStream din = new DataInputStream(new BufferedInputStream(baInputStream));
+        int ipLength = din.readInt();
+        byte[] ipBytes = new byte[ipLength];
+        din.readFully(ipBytes);
+        hostname = new String(ipBytes);
         numOfMSent = din.readInt();
         sumOfSent = din.readInt();
         numOfMReceived = din.readInt();
@@ -43,6 +48,10 @@ public class TrafficSummary implements Protocol, Event {
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
         DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutputStream));
         dout.writeInt(this.messageType);
+        byte[] ipBytes = hostname.getBytes();
+        int elementLength = ipBytes.length;
+        dout.writeInt(elementLength);
+        dout.write(ipBytes);
         dout.writeInt(this.numOfMSent);
         dout.writeInt(this.sumOfSent);
         dout.writeInt(this.numOfMReceived);

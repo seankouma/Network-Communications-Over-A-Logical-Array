@@ -179,10 +179,17 @@ public class Registry implements Node {
         this.totalReceived = totalReceived.add(new BigInteger(Integer.toString(summary.numOfMReceived)));
         this.totalSent = totalSent.add(new BigInteger(Integer.toString(summary.numOfMSent)));
 
-        System.out.format("Node  |%19d|%23d|%16d|%17d|\n", summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
+        System.out.format( "%s|%19d|%23d|%16d|%17d|\n", this.pad(summary.hostname), summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
         if (completed == nodes.size()) {
-            System.out.format(" Sum  |%19d|%23d|%16d|%17d|\n", this.totalSent, this.totalReceived, this.sumSent, this.sumReceived);
+            System.out.format("Sum            |%19d|%23d|%16d|%17d|\n", this.totalSent, this.totalReceived, this.sumSent, this.sumReceived);
         }
+    }
+
+    private String pad(String hostname) {
+        String newhost = hostname;
+        while (newhost.length() != 15)
+            newhost = newhost.concat(" ");
+        return newhost;
     }
 
     void sendRegisterResponse(int identifier) throws IOException {

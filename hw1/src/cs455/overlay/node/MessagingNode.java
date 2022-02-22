@@ -118,8 +118,8 @@ public class MessagingNode implements Node {
     }
 
     public void handlePullTrafficSummary() {
-        TrafficSummary summary = new TrafficSummary(this.numOfMSent, this.sumOfSent, this.numOfMReceived, this.sumOfReceived);
         try {
+            TrafficSummary summary = new TrafficSummary(this.numOfMSent, this.sumOfSent, this.numOfMReceived, this.sumOfReceived, InetAddress.getLocalHost().getHostName());
             this.sender.sendData(summary.getBytes());
             this.numOfMSent = 0;
             this.sumOfSent = 0;
