@@ -1,10 +1,7 @@
 package cs455.overlay.node;
 
-import java.util.HashSet;
 import java.util.Random;
-
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.BufferedOutputStream;
@@ -15,11 +12,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Random;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.*;
@@ -157,7 +152,7 @@ public class Registry implements Node {
 
     public void gatherTrafficSummaries() throws IOException {
         try {
-            Thread.sleep(15000);
+            Thread.sleep(25000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -184,10 +179,17 @@ public class Registry implements Node {
         this.totalReceived = totalReceived.add(new BigInteger(Integer.toString(summary.numOfMReceived)));
         this.totalSent = totalSent.add(new BigInteger(Integer.toString(summary.numOfMSent)));
 
-        System.out.format("Node  |%19d|%23d|%16d|%17d|\n", summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
+        System.out.format( "%s|%19d|%23d|%16d|%17d|\n", this.pad(summary.hostname), summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
         if (completed == nodes.size()) {
-            System.out.format(" Sum  |%19d|%23d|%16d|%17d|\n", this.totalSent, this.totalReceived, this.sumSent, this.sumReceived);
+            System.out.format("Sum            |%19d|%23d|%16d|%17d|\n", this.totalSent, this.totalReceived, this.sumSent, this.sumReceived);
         }
+    }
+
+    private String pad(String hostname) {
+        String newhost = hostname;
+        while (newhost.length() != 15)
+            newhost = newhost.concat(" ");
+        return newhost;
     }
 
     void sendRegisterResponse(int identifier) throws IOException {

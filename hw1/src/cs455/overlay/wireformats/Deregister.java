@@ -5,21 +5,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.TreeSet;
-
-import cs455.overlay.transport.TCPSender;
-import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.wireformats.ConnectionsDirective;
 
 
 public class Deregister implements Protocol, Event{
