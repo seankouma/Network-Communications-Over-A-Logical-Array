@@ -21,8 +21,9 @@ public class TCPReceiverThread implements Runnable {
         int dataLength;
         while (socket != null) {
             try {
-                dataLength = input.readInt();
-                int id = input.readInt();
+                dataLength = input.readInt(); // Read the data length
+                int id = input.readInt(); // Read the message ID
+                
                 byte[] data = new byte[dataLength-4];
                 input.readFully(data, 0, dataLength-4);
                 caller.handleEvent(id, dataLength-4, data);

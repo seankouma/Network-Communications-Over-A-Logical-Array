@@ -24,6 +24,7 @@ public class MessagingNode implements Node {
     private MessagingNodeHelper helper = null;
 
     MessagingNode(String hostname, int otherPort) throws IOException, InterruptedException {
+        // Initiate variables and start threads
         ServerSocket serverSocket = new ServerSocket(0);
         server = new TCPServerThread(serverSocket, this);
         Thread sthread = new Thread(server);
@@ -41,6 +42,7 @@ public class MessagingNode implements Node {
         byte[] bytes = register.getBytes();
         sender.sendData(bytes);
 
+        // Listen for CLI input
         while (true) {
             BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             String line = input.readLine();
@@ -53,8 +55,10 @@ public class MessagingNode implements Node {
     }
 
 
+    
     @Override
     public void handleEvent(int id, int dataLength, byte[] data) throws IOException {
+        // This method handles all the events. So as soon as the TCPReceiverThread gets the message, it calls this function
         switch (id) {
             case Protocol.REGISTER_RESPONSE:
                 RegisterResponse response = new RegisterResponse(data);

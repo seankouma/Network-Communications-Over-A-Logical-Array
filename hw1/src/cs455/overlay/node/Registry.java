@@ -22,7 +22,7 @@ import cs455.overlay.wireformats.*;
 
 public class Registry implements Node {
 
-    public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>();
+    public static HashMap<Integer, Socket> nodes = new HashMap<Integer, Socket>(); // Keeps track of all the MessagingNodes in the system using {id, Socket} key-pairs
     TCPServerThread server = null;
     TCPSender sender = null;
     volatile int completed = 0;
@@ -40,6 +40,7 @@ public class Registry implements Node {
         sthread.start();
 
         while (true) {
+            //List for CLI input
             BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
             String line = input.readLine();
             if (line.equals("list-messaging-nodes")) {
@@ -58,6 +59,7 @@ public class Registry implements Node {
         }
     }
 
+    // Handle registration requests after the request has been unmarshalled
     public static int register(Register register) throws UnknownHostException, IOException {
         Random r = new Random();
         int max = 1024;
@@ -70,6 +72,7 @@ public class Registry implements Node {
         return rand;
     }
 
+    // Handle deregistration requests
     public boolean deregister(Deregister register, int id) throws UnknownHostException, IOException {
         for (Socket s : nodes.values()) {
             System.out.println(s.getInetAddress().getHostName() + " " + register.ip + " " + Integer.toString(s.getPort()) + " " + Integer.toString(register.port));
@@ -85,6 +88,7 @@ public class Registry implements Node {
         return false;
     }
 
+    // After we have all the MessagingNodes registered that we want, setup the ring configuration and send out connection messages
     public static void setupOverlay() throws IOException {
         ArrayList<Integer> keys = new ArrayList<Integer>(new TreeSet<Integer>(nodes.keySet()));
         for (int i = 0; i < keys.size() - 1; i++) {
@@ -101,6 +105,7 @@ public class Registry implements Node {
         sender.sendData(data);
     }
 
+    // Signal to initiate sending messages
     public void taskInitiate(int num) throws IOException {
         TaskInitiate init = new TaskInitiate(num);
         byte[] data = init.getBytes();
@@ -112,6 +117,7 @@ public class Registry implements Node {
 
     @Override
     public void handleEvent(int id, int dataLength, byte[] data) throws IOException {
+        // As soon as a TCPReceiverThread receives a message, it calls this method
         switch (id) {
             case Protocol.REGISTER_REQUEST:
                 Register register = new Register(data, dataLength);
@@ -136,6 +142,7 @@ public class Registry implements Node {
         }
     }
 
+    // Handle nodes signaling they're finished
     public void handleTaskComplete(int id) {
         ++completed;
         System.out.println("Node completed");
@@ -150,6 +157,7 @@ public class Registry implements Node {
         }
     }
 
+    // Request traffic data from nodes
     public void gatherTrafficSummaries() throws IOException {
         try {
             Thread.sleep(25000);
@@ -172,6 +180,7 @@ public class Registry implements Node {
         }
     }
 
+    // Handle the traffic data responses from nodes
     public synchronized void handleTrafficSummary(TrafficSummary summary) {
         ++completed;
         this.sumSent = sumSent.add(new BigInteger(Integer.toString(summary.sumOfSent)));
@@ -185,6 +194,7 @@ public class Registry implements Node {
         }
     }
 
+    //Used entirely for formatting purposes
     private String pad(String hostname) {
         String newhost = hostname;
         while (newhost.length() != 15)
@@ -199,6 +209,7 @@ public class Registry implements Node {
         sender.sendData(bytes);
     }
 
+    // This was put here for convenience. Otherwise it would live in the RegisterResponse.java class
     public byte[] getRegisterResponseBytes(int identifier) throws IOException {
         byte[] marshalledBytes = null;
         ByteArrayOutputStream baOutputStream = new ByteArrayOutputStream();
