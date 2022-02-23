@@ -78,9 +78,10 @@ public class Registry implements Node {
             System.out.println(s.getInetAddress().getHostName() + " " + register.ip + " " + Integer.toString(s.getPort()) + " " + Integer.toString(register.port));
             if (s.getPort() == register.port) {
                 sender = new TCPSender(s);
-                DeregisterResponse response = new DeregisterResponse("Successfully deregistered", register.port);
+                String message = "Failed deregistration";
+                if (nodes.values().remove(s) == true) message = "Successfully deregistered";
+                DeregisterResponse response = new DeregisterResponse(message, register.port);
                 sender.sendData(response.getBytes());
-                nodes.values().remove(s);
                 return true;
             }
         }
@@ -145,9 +146,8 @@ public class Registry implements Node {
     // Handle nodes signaling they're finished
     public void handleTaskComplete(int id) {
         ++completed;
-        System.out.println("Node completed");
+        System.out.println("Node completed " + Integer.toString(completed));
         if (completed == nodes.size()) {
-            completed = 0;
             System.out.println("All nodes completed");
             try {   
                 gatherTrafficSummaries();
@@ -160,7 +160,7 @@ public class Registry implements Node {
     // Request traffic data from nodes
     public void gatherTrafficSummaries() throws IOException {
         try {
-            Thread.sleep(25000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -182,7 +182,6 @@ public class Registry implements Node {
 
     // Handle the traffic data responses from nodes
     public synchronized void handleTrafficSummary(TrafficSummary summary) {
-        ++completed;
         this.sumSent = sumSent.add(new BigInteger(Integer.toString(summary.sumOfSent)));
         this.sumReceived = sumReceived.add(new BigInteger(Integer.toString(summary.sumOfReceived)));
         this.totalReceived = totalReceived.add(new BigInteger(Integer.toString(summary.numOfMReceived)));
@@ -190,6 +189,7 @@ public class Registry implements Node {
 
         System.out.format( "%s|%19d|%23d|%16d|%17d|\n", this.pad(summary.hostname), summary.numOfMSent, summary.numOfMReceived, summary.sumOfSent, summary.sumOfReceived);
         if (completed == nodes.size()) {
+            this.completed = 0;
             System.out.format("Sum            |%19d|%23d|%16d|%17d|\n", this.totalSent, this.totalReceived, this.sumSent, this.sumReceived);
         }
     }

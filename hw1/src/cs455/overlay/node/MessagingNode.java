@@ -129,7 +129,7 @@ public class MessagingNode implements Node {
             this.sumOfSent = 0;
             this.numOfMReceived = 0;
             this.sumOfReceived = 0;
-            System.exit(0);
+            // System.exit(0);
 
         } catch (IOException e) {
             e.printStackTrace();
