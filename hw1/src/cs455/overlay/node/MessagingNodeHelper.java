@@ -9,6 +9,9 @@ import java.util.Random;
 
 
 public class MessagingNodeHelper implements Runnable {
+    /* This class is intended to be run as its own thread and solely handles the job of sending the
+        specified number of messages to its neighbor node. It does NOT handle message relaying.
+    */
     TCPSender sender = null;
     public int identifier = 0;
     public int numOfMSent = 0;
@@ -30,7 +33,7 @@ public class MessagingNodeHelper implements Runnable {
         for (int i = 0; i < num; i++) {
             DataTraffic traffic = new DataTraffic(rand.nextInt(), this.identifier);
             try {
-                if (i % 50000 == 0) Thread.sleep(2000);
+                if (i % 50000 == 0) Thread.sleep(2000); // To prevent issues where one buffer fills up significantly faster than another one.
                 this.numOfMSent += 1;
                 this.sumOfSent += traffic.random;
                 this.sender.sendData(traffic.getBytes());
