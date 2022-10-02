@@ -1,9 +1,4 @@
-# cs455-hw1
-CS 455 HW1
-README.txt
-
-# Team Name: Team Number 2
-Teammates: Sean Kouma, Nick Kowalczyk, Ryan Anderson
+## Network Communications Over a Logical Array
 
 Overview: Allow for commuinication between nodes and a registry over a TCP 
 connection. 
